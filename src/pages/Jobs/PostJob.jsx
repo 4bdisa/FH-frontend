@@ -1,0 +1,188 @@
+import React, { useState } from 'react';
+
+export function JobPostFlow() {
+  const [step, setStep] = useState(1);
+  const [jobDetails, setJobDetails] = useState({ description: '', category: '' });
+  const [providers, setProviders] = useState([]);
+  const [sort, setSort] = useState(''); // Add this line
+
+  // const [selectedProvider, setSelectedProvider] = useState(null);
+
+  // PostJob.jsx
+
+  const handleJobDetailsSubmit = async () => {
+    try {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          console.log('Auth Token:', localStorage.getItem('authToken'));
+
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            },
+            body: JSON.stringify({
+              description: jobDetails.description,
+              category: jobDetails.category,
+              customerLocation: [longitude, latitude],
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          setProviders(data.providers || []); // Fallback to an empty array if providers is undefined
+          setStep(2);
+        }, (error) => {
+          console.error('Error fetching location:', error);
+          alert('Please enable location access to continue.');
+        });
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    } catch (error) {
+      console.error('Error posting job and fetching providers:', error);
+    }
+  };
+  // Step 2: Select provider
+  const handleProviderSelect = async (providerId) => {
+    try {
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({
+          ...jobDetails,
+          providerId
+        })
+      });
+
+      if (response.ok) {
+        setStep(3); // Confirmation step
+      }
+    } catch (error) {
+      console.error('Error creating job:', error);
+    }
+  };
+
+  const sortedProviders = [...providers].sort((a, b) => {
+    if (sort === 'rating') return b.rating - a.rating;
+    if (sort === 'price') return a.hourlyRate - b.hourlyRate;
+    if (sort === 'experience') return b.completedJobs - a.completedJobs;
+    return 0;
+  });
+
+  return (
+    <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6">
+      {step === 1 && (
+        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">
+            Post a Job
+          </h2>
+          <textarea
+            placeholder="Enter job description..."
+            value={jobDetails.description}
+            onChange={(e) =>
+              setJobDetails({ ...jobDetails, description: e.target.value })
+            }
+            className="w-full p-3 border border-blue-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            placeholder="Enter job category (e.g., Plumber, Electrician)"
+            value={jobDetails.category}
+            onChange={(e) =>
+              setJobDetails({ ...jobDetails, category: e.target.value })
+            }
+            className="w-full p-3 border border-blue-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleJobDetailsSubmit}
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
+          >
+            Find Providers
+          </button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+          <h3 className="text-xl font-semibold text-blue-600 mb-4 text-center">
+            Select a Service Provider
+          </h3>
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={() => setSort("rating")}
+              className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
+            >
+              Sort by Rating
+            </button>
+            <button
+              onClick={() => setSort("price")}
+              className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
+            >
+              Sort by Price
+            </button>
+            <button
+              onClick={() => setSort("experience")}
+              className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
+            >
+              Sort by Experience
+            </button>
+          </div>
+
+          {sortedProviders && sortedProviders.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {sortedProviders.map((provider) => (
+                <div
+                  key={provider._id}
+                  className="p-4 border border-blue-300 rounded-lg shadow-sm bg-blue-50"
+                >
+                  <h4 className="text-lg font-semibold text-blue-700">
+                    {provider.email}
+                  </h4>
+                  <p className="text-sm text-gray-700">
+                    Rating: {provider.rating}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Hourly Rate: ${provider.hourlyRate}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Completed Jobs: {provider.completedJobs}
+                  </p>
+                  <button
+                    onClick={() => handleProviderSelect(provider._id)}
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
+                  >
+                    Select Provider
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">No providers found.</p>
+          )}
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md text-center">
+          <h3 className="text-2xl font-semibold text-blue-600 mb-4">
+            Job Posted Successfully!
+          </h3>
+          <p className="text-gray-700">
+            Your job has been posted, and the selected provider will contact you
+            soon.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
