@@ -10,7 +10,7 @@ import Home from "./pages/home";
 import { JobPostFlow } from "./pages/Jobs/PostJob";
 import UpdateProfile from "./pages/Profile/UpdateProfile";
 import LearnMore from "./pages/LearnMore";
-
+ 
 const App = () => (
   <Router>
     <Routes>

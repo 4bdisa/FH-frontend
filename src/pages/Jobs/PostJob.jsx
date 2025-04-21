@@ -4,20 +4,26 @@ export function JobPostFlow() {
   const [step, setStep] = useState(1);
   const [jobDetails, setJobDetails] = useState({ description: '', category: '' });
   const [providers, setProviders] = useState([]);
-  const [sort, setSort] = useState(''); // Add this line
-
-  // const [selectedProvider, setSelectedProvider] = useState(null);
-
-  // PostJob.jsx
+  const [sort, setSort] = useState('');
+  const [error, setError] = useState(''); // Add error state for validation
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const handleJobDetailsSubmit = async () => {
+    // Validate the description field
+    if (!jobDetails.description.trim()) {
+      setError('Description is required');
+      return;
+    }
+
+    setError(''); // Clear any previous errors
+
+
     try {
       if (navigator.geolocation) {
+
         navigator.geolocation.getCurrentPosition(async (position) => {
           const { latitude, longitude } = position.coords;
-
-          console.log('Auth Token:', localStorage.getItem('authToken'));
-
+          setLoading(true); // Set loading to true
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
             method: 'POST',
             headers: {
@@ -47,9 +53,11 @@ export function JobPostFlow() {
       }
     } catch (error) {
       console.error('Error posting job and fetching providers:', error);
+    } finally {
+      setLoading(false); // Set loading to false after the process is complete
     }
   };
-  // Step 2: Select provider
+
   const handleProviderSelect = async (providerId) => {
     try {
       const response = await fetch('/api/jobs', {
@@ -92,8 +100,10 @@ export function JobPostFlow() {
             onChange={(e) =>
               setJobDetails({ ...jobDetails, description: e.target.value })
             }
-            className="w-full p-3 border border-blue-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-blue-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {/* Display error message if description is empty */}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <input
             type="text"
             placeholder="Enter job category (e.g., Plumber, Electrician)"
@@ -106,14 +116,54 @@ export function JobPostFlow() {
           <button
             onClick={handleJobDetailsSubmit}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
+            disabled={loading} // Disable button while loading
           >
-            Find Providers
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+                Loading...
+              </div>
+            ) : (
+              'Find Providers'
+            )}
           </button>
         </div>
       )}
 
       {step === 2 && (
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl relative">
+          {/* Back Button */}
+          <button
+            onClick={() => setStep(1)} // Go back to Step 1
+            className="absolute top-4 left-4 flex items-center px-4 py-2 bg-gray-100 text-blue-600 rounded-md shadow-md hover:bg-gray-200 transition"
+          >
+            <img
+              src="https://img.icons8.com/?size=100&id=1DQ3UxqezXN2&format=png&color=000000"
+              alt="Back"
+              className="h-5 w-5 mr-2"
+            />
+            Back
+          </button>
+
           <h3 className="text-xl font-semibold text-blue-600 mb-4 text-center">
             Select a Service Provider
           </h3>
