@@ -10,10 +10,18 @@ import Home from "./pages/home";
 import { JobPostFlow } from "./pages/Jobs/PostJob";
 import UpdateProfile from "./pages/Profile/UpdateProfile";
 import LearnMore from "./pages/LearnMore";
- 
+import ServiceProviderDashboard from "./pages/ServiceProviderDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import ServiceProviderProfileUpdate from "./pages/Profile/ServiceProviderProfileUpdate";
+import CustomerProfileUpdate from "./pages/Profile/CustomerProfileUpdate";
+import ManageServices from "./pages/ManageServices";
+import BrowseServices from "./pages/BrowseServices";
+import JobHistory from "./pages/JobHistory";
+
 const App = () => (
   <Router>
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/pages/SignIn" element={<SignIn />} />
       <Route path="/select-role" element={<SelectRole />} />
@@ -22,13 +30,26 @@ const App = () => (
       <Route path="/oauth/callback" element={<OAuthRedirect />} />
       <Route path="/learn-more" element={<LearnMore />} />
 
-      {/* Dashboard Layout */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route index element={<div>Welcome to the Dashboard!</div>} />
-          <Route path="jobs/post" element={<JobPostFlow />} />
-          <Route path="profile/update" element={<UpdateProfile />} />
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute allowedRoles={["service_provider"]} />}>
+        <Route path="/service-provider-dashboard" element={<ServiceProviderDashboard />}>
+          <Route index element={<ManageServices />} />
+          <Route path="profile-update" element={<ServiceProviderProfileUpdate />} />
+          <Route path="manage-services" element={<ManageServices />} />
         </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
+        <Route path="/customer-dashboard" element={<CustomerDashboard />}>
+          <Route index element={<BrowseServices />} />
+          <Route path="profile-update" element={<CustomerProfileUpdate />} />
+          <Route path="job-history" element={<JobHistory />} />
+        </Route>
+        <Route path="/dashboard/jobs/post" element={<JobPostFlow />} />
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["service_provider", "client"]} />}>
+        <Route path="/dashboard/profile/update" element={<UpdateProfile />} />
       </Route>
     </Routes>
   </Router>

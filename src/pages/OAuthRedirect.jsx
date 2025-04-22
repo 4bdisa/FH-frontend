@@ -12,21 +12,32 @@ const OAuthRedirect = () => {
 
       if (token && user) {
         try {
+          // Parse the user object from the query string
+          const parsedUser = JSON.parse(user);
+
           // Store the token and user in localStorage
           await Promise.resolve(localStorage.setItem("authToken", token));
           await Promise.resolve(
             localStorage.setItem(
               "user",
               JSON.stringify({
-                ...JSON.parse(user), // Parse the user string into an object
-                profileImage: JSON.parse(user).profileImage || "https://placekitten.com/40/40",
+                ...parsedUser,
+                profileImage: parsedUser.profileImage || "https://placekitten.com/40/40",
               })
             )
-            
           );
-          console.log("User data stored in localStorage:", user);
-          // Navigate to the dashboard
-          navigate("/dashboard");
+
+          console.log("User data stored in localStorage:", parsedUser);
+
+          // Redirect based on the user's role
+          if (parsedUser.role === "service_provider") {
+            navigate("/service-provider-dashboard");
+          } else if (parsedUser.role === "client") {
+            navigate("/customer-dashboard");
+          } else {
+            console.error("Unknown user role:", parsedUser.role);
+            navigate("/pages/SignIn"); // Redirect to login if role is unknown
+          }
         } catch (error) {
           console.error("Error during OAuth redirect:", error);
           navigate("/pages/SignIn"); // Redirect to login on error
