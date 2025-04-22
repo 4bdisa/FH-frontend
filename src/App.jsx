@@ -44,6 +44,7 @@ const App = () => (
           <Route index element={<BrowseServices />} />
           <Route path="profile-update" element={<CustomerProfileUpdate />} />
           <Route path="job-history" element={<JobHistory />} />
+          <Route path="post-job" element={<JobPostFlow />} /> {/* Add this line */}
         </Route>
         <Route path="/dashboard/jobs/post" element={<JobPostFlow />} />
       </Route>

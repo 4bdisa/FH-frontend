@@ -1,9 +1,8 @@
 /* eslint-disable no-undef */
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/auth";
-import Nano from "../assets/giflogo.gif";
+import { loginUser } from "../services/auth"; // Ensure this service is implemented correctly
+import Nano from "../assets/giflogo.gif"; // Ensure this file exists in the assets folder
 
 const SignIn = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -35,11 +34,17 @@ const SignIn = () => {
           role: user.role,
         })
       );
-      
-      // Redirect to the dashboard
-      navigate("/dashboard");
+
+      // Redirect to the appropriate dashboard based on the user's role
+      if (user.role === "service_provider") {
+        navigate("/service-provider-dashboard");
+      } else if (user.role === "client") {
+        navigate("/customer-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
-      setError(error.message || "Login failed");
+      setError(error.message || "Login failed. Please check your credentials.");
     }
   };
 
@@ -48,7 +53,7 @@ const SignIn = () => {
       // Trigger the backend Google OAuth login flow
       window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     } catch (error) {
-      setError(error.message || "Login failed");
+      setError(error.message || "Google login failed. Please try again.");
     }
   };
 
@@ -64,7 +69,7 @@ const SignIn = () => {
         </div>
 
         {/* Error Message */}
-        {error && <p className="text-red-500 text-center">{error.error}</p>}
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {/* Email Input */}
@@ -135,7 +140,7 @@ const SignIn = () => {
         <p className="mt-6 text-center text-sm text-gray-500">
           Not a member?{" "}
           <a
-            // href="/signup"
+            //             href="/signup"
             onClick={handleGoogleLogin}
             className="font-semibold text-indigo-600 hover:text-indigo-500"
           >

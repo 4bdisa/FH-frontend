@@ -153,7 +153,10 @@ export function JobPostFlow() {
         <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl relative">
           {/* Back Button */}
           <button
-            onClick={() => setStep(1)} // Go back to Step 1
+            onClick={() => {
+              setStep(1); // Go back to Step 1
+              setLoading(false); // Reset loading state
+            }}
             className="absolute top-4 left-4 flex items-center px-4 py-2 bg-gray-100 text-blue-600 rounded-md shadow-md hover:bg-gray-200 transition"
           >
             <img
@@ -198,9 +201,7 @@ export function JobPostFlow() {
                   <h4 className="text-lg font-semibold text-blue-700">
                     {provider.email}
                   </h4>
-                  <p className="text-sm text-gray-700">
-                    Rating: {provider.rating}
-                  </p>
+                  <p className="text-sm text-gray-700">Rating: {provider.rating}</p>
                   <p className="text-sm text-gray-700">
                     Hourly Rate: ${provider.hourlyRate}
                   </p>

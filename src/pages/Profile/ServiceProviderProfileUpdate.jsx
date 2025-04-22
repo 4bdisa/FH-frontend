@@ -2,90 +2,138 @@ import React, { useState } from "react";
 
 const ServiceProviderProfileUpdate = () => {
     const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        services: "",
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Updated Service Provider Profile:", formData);
-        // Add API call to update profile
-    };
+            skills: "",
+            keywords: "",
+            country: "",
+            workDays: "",
+            experienceYears: "",
+            homeService: false,
+        });
+    
+        const handleChange = (e) => {
+            const { name, value, type, checked } = e.target;
+            setFormData({
+                ...formData,
+                [name]: type === "checkbox" ? checked : value,
+            });
+        };
+    
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/update`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                    body: JSON.stringify(formData),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const updatedUser = await response.json();
+    
+                // Update localStorage with the new user data
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        ...JSON.parse(localStorage.getItem("user")), // Keep existing data
+                        ...updatedUser.user, // Merge updated data
+                    })
+                );
+    
+                alert("Profile updated successfully!");
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert("Failed to update profile. Please try again.");
+            }
+        };
 
     return (
-        <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <div className="min-h-screen bg-blue-50 flex items-center justify-center p-6">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg"
+                className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg"
             >
-                <h2 className="text-2xl font-semibold text-blue-600 mb-4">
-                    Update Service Provider Profile
+                <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    Update Profile
                 </h2>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Name</label>
+                    <label className="block text-gray-700 font-medium mb-2">Skills</label>
                     <input
                         type="text"
-                        name="name"
-                        value={formData.name}
+                        name="skills"
+                        value={formData.skills}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your name"
+                        placeholder="e.g., Plumbing, Electrical"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your email"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700">Phone</label>
+                    <label className="block text-gray-700 font-medium mb-2">Keywords</label>
                     <input
                         type="text"
-                        name="phone"
-                        value={formData.phone}
+                        name="keywords"
+                        value={formData.keywords}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your phone number"
+                        placeholder="e.g., Repair, Maintenance"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Address</label>
+                    <label className="block text-gray-700 font-medium mb-2">Country</label>
                     <input
                         type="text"
-                        name="address"
-                        value={formData.address}
+                        name="country"
+                        value={formData.country}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your address"
+                        placeholder="e.g., USA"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Services</label>
-                    <textarea
-                        name="services"
-                        value={formData.services}
+                    <label className="block text-gray-700 font-medium mb-2">Work Days</label>
+                    <input
+                        type="text"
+                        name="workDays"
+                        value={formData.workDays}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Describe the services you offer"
+                        placeholder="e.g., Monday, Tuesday"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Years of Experience
+                    </label>
+                    <input
+                        type="number"
+                        name="experienceYears"
+                        value={formData.experienceYears}
+                        onChange={handleChange}
+                        placeholder="e.g., 5"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Home Service
+                    </label>
+                    <input
+                        type="checkbox"
+                        name="homeService"
+                        checked={formData.homeService}
+                        onChange={handleChange}
+                        className="mr-2"
+                    />
+                    <span>Available for home service</span>
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition"
+                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
                 >
                     Update Profile
                 </button>

@@ -39,17 +39,7 @@ const CustomerProfileUpdate = () => {
                         placeholder="Enter your name"
                     />
                 </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your email"
-                    />
-                </div>
+                
                 <div className="mb-4">
                     <label className="block text-gray-700">Phone</label>
                     <input
@@ -62,14 +52,14 @@ const CustomerProfileUpdate = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Address</label>
+                    <label className="block text-gray-700">City</label>
                     <input
                         type="text"
-                        name="address"
-                        value={formData.address}
+                        name="City"
+                        value={formData.City}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border rounded-md"
-                        placeholder="Enter your address"
+                        placeholder="Enter your city"
                     />
                 </div>
                 <button

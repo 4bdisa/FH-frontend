@@ -77,6 +77,28 @@ const CustomerDashboard = () => {
                         </li>
                         <li>
                             <Link
+                                to="/customer-dashboard/post-job"
+                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
+                            >
+                                <svg
+                                    className="w-5 h-5 mr-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 4v16m8-8H4"
+                                    ></path>
+                                </svg>
+                                Post Job
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
                                 to="/customer-dashboard/job-history"
                                 className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
                             >
@@ -97,6 +119,7 @@ const CustomerDashboard = () => {
                                 Job History
                             </Link>
                         </li>
+                      
                     </ul>
                 </nav>
             </aside>
