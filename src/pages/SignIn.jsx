@@ -34,6 +34,7 @@ const SignIn = () => {
           role: user.role,
         })
       );
+      localStorage.setItem("userId", user.id); // Ensure this is stored if available
 
       // Redirect to the appropriate dashboard based on the user's role
       if (user.role === "service_provider") {

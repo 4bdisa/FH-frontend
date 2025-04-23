@@ -7,28 +7,29 @@ export function JobPostFlow() {
   const [sort, setSort] = useState('');
   const [error, setError] = useState(''); // Add error state for validation
   const [loading, setLoading] = useState(false); // Add loading state
+  const [coordinates, setCoordinates] = useState({ longitude: null, latitude: null });
 
   const handleJobDetailsSubmit = async () => {
-    // Validate the description field
     if (!jobDetails.description.trim()) {
-      setError('Description is required');
+      setError("Description is required");
       return;
     }
 
-    setError(''); // Clear any previous errors
-
+    setError("");
 
     try {
       if (navigator.geolocation) {
-
         navigator.geolocation.getCurrentPosition(async (position) => {
           const { latitude, longitude } = position.coords;
-          setLoading(true); // Set loading to true
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
-            method: 'POST',
+          setCoordinates({ latitude, longitude }); // Store coordinates in state
+          setLoading(true);
+
+          // Fetch providers
+          const jobResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
             body: JSON.stringify({
               description: jobDetails.description,
@@ -37,46 +38,61 @@ export function JobPostFlow() {
             }),
           });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          if (!jobResponse.ok) {
+            throw new Error(`HTTP error! status: ${jobResponse.status}`);
           }
 
-          const data = await response.json();
-          setProviders(data.providers || []); // Fallback to an empty array if providers is undefined
-          setStep(2);
-        }, (error) => {
-          console.error('Error fetching location:', error);
-          alert('Please enable location access to continue.');
+          const jobData = await jobResponse.json();
+          console.log("Job Data:", jobData); // Debugging
+          setProviders(jobData.providers || []);
+          setStep(2); // Move to Step 2
         });
       } else {
-        alert('Geolocation is not supported by your browser.');
+        alert("Geolocation is not supported by your browser.");
       }
     } catch (error) {
-      console.error('Error posting job and fetching providers:', error);
+      console.error("Error fetching providers:", error);
+      alert("Failed to fetch providers. Please try again.");
     } finally {
-      setLoading(false); // Set loading to false after the process is complete
+      setLoading(false);
     }
   };
 
   const handleProviderSelect = async (providerId) => {
     try {
-      const response = await fetch('/api/jobs', {
-        method: 'POST',
+      setLoading(true);
+
+      console.log("Creating service request with providerId:", providerId);
+
+      const requestResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/requests`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify({
-          ...jobDetails,
-          providerId
-        })
+          category: jobDetails.category,
+          description: jobDetails.description,
+          providerId, // Selected provider
+          location: { type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] }, // Use state
+          budget: jobDetails.budget,
+          isFixedPrice: jobDetails.isFixedPrice,
+        }),
       });
 
-      if (response.ok) {
-        setStep(3); // Confirmation step
+      if (!requestResponse.ok) {
+        throw new Error(`HTTP error! status: ${requestResponse.status}`);
       }
+
+      const requestData = await requestResponse.json();
+      console.log("Service Request Created:", requestData);
+
+      setStep(3); // Move to the confirmation step
     } catch (error) {
-      console.error('Error creating job:', error);
+      console.error("Error creating service request:", error);
+      alert("Failed to create service request. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -226,11 +242,10 @@ export function JobPostFlow() {
       {step === 3 && (
         <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md text-center">
           <h3 className="text-2xl font-semibold text-blue-600 mb-4">
-            Job Posted Successfully!
+            Service Request Created Successfully!
           </h3>
           <p className="text-gray-700">
-            Your job has been posted, and the selected provider will contact you
-            soon.
+            Your service request has been sent to the selected provider. They will contact you soon.
           </p>
         </div>
       )}

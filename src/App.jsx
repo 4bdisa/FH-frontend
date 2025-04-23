@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./pages/SignIn";
-import Dashboard from "./pages/Dashboard";
 import OAuthRedirect from "./pages/OAuthRedirect";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SelectRole from "./pages/auth/SelectRole";
@@ -14,7 +15,7 @@ import ServiceProviderDashboard from "./pages/ServiceProviderDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import ServiceProviderProfileUpdate from "./pages/Profile/ServiceProviderProfileUpdate";
 import CustomerProfileUpdate from "./pages/Profile/CustomerProfileUpdate";
-import ManageServices from "./pages/ManageServices";
+import ManageRequests from "./pages/Provider/ManageRequests";
 import BrowseServices from "./pages/BrowseServices";
 import JobHistory from "./pages/JobHistory";
 
@@ -33,9 +34,9 @@ const App = () => (
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["service_provider"]} />}>
         <Route path="/service-provider-dashboard" element={<ServiceProviderDashboard />}>
-          <Route index element={<ManageServices />} />
+          <Route index element={<ManageRequests />} />
           <Route path="profile-update" element={<ServiceProviderProfileUpdate />} />
-          <Route path="manage-services" element={<ManageServices />} />
+          <Route path="manage-services" element={<ManageRequests />} />
         </Route>
       </Route>
 
@@ -53,6 +54,7 @@ const App = () => (
         <Route path="/dashboard/profile/update" element={<UpdateProfile />} />
       </Route>
     </Routes>
+    <ToastContainer position="top-right" autoClose={3000} />
   </Router>
 );
 
