@@ -10,28 +10,28 @@ const ManageRequests = () => {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                let providerId = localStorage.getItem("userId");
-                const email = JSON.parse(localStorage.getItem("user"))?.email;
-
-                console.log("Provider ID:", providerId); // Debugging
-                console.log("Provider Email:", email); // Debugging
-
-                if (!providerId && !email) {
-                    throw new Error("Provider ID or email is missing. Please log in again.");
+                const token = localStorage.getItem("authToken");
+                if (!token) {
+                    throw new Error("Authentication token is missing. Please log in again.");
                 }
 
-                let response;
-                if (providerId) {
-                    response = await API.get(`/v1/requests/${providerId}`);
-                } else if (email) {
-                    response = await API.get(`/v1/requests/email/${email}`);
-                }
+                const response = await API.get(`/api/v1/requests/get`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+                    },
+                });
 
-                console.log("API Response:", response); // Debugging
-                setRequests(response.data.data);
+                if (response.data.data.length === 0) {
+                    setError("No requests yet."); // Display "No requests yet" if no jobs are found
+                } else {
+                    setRequests(response.data.data); // Set the requests if data is found
+                }
             } catch (err) {
-                console.error("Error fetching requests:", err); // Debugging
-                setError("Failed to fetch requests. Please try again.");
+                if (err.response && err.response.status === 404 && err.response.data.message === "No requests found for this provider") {
+                    setError("No requests yet."); // Display "No requests yet" if no requests are found
+                } else {
+                    setError("Failed to fetch requests. Please try again."); // Handle other errors
+                }
             } finally {
                 setLoading(false);
             }
@@ -46,11 +46,10 @@ const ManageRequests = () => {
 
         try {
             const response = await API.patch(`/v1/requests/${requestId}`, { status: action });
-            console.log("API Response:", response); // Debugging
+
             toast.success(`Request ${action} successfully!`);
             setRequests((prev) => prev.filter((request) => request._id !== requestId));
         } catch (err) {
-            console.error("Error updating request:", err); // Debugging
             toast.error(`Failed to ${action} request. Please try again.`);
         }
     };
@@ -59,15 +58,21 @@ const ManageRequests = () => {
         return <div className="text-center">Loading requests...</div>;
     }
 
-    if (error) {
-        return <div className="text-center text-red-500">{error}</div>;
-    }
-
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-6 text-center">Manage Requests</h2>
-            {requests.length === 0 ? (
-                <p className="text-center text-gray-500">No pending requests.</p>
+            {error === "No requests yet." ? (
+                <p className="text-center text-black bg-gray-100 p-4 rounded-md shadow-sm">
+                    {error}
+                </p>
+            ) : error ? (
+                <p className="text-center text-red-500 bg-gray-100 p-4 rounded-md shadow-sm">
+                    {error}
+                </p>
+            ) : requests.length === 0 ? (
+                <p className="text-center text-black bg-gray-100 p-4 rounded-md shadow-sm">
+                    No requests yet.
+                </p>
             ) : (
                 <ul className="space-y-4">
                     {requests.map((request) => (
