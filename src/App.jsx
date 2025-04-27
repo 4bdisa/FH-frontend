@@ -17,7 +17,7 @@ import ServiceProviderProfileUpdate from "./pages/Profile/ServiceProviderProfile
 import CustomerProfileUpdate from "./pages/Profile/CustomerProfileUpdate";
 import ManageRequests from "./pages/Provider/ManageRequests";
 import BrowseServices from "./pages/BrowseServices";
-import JobHistory from "./pages/JobHistory";
+import JobHistory from "./pages/Jobs/JobHistory";
 
 const App = () => (
   <Router>

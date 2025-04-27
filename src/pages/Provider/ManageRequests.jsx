@@ -30,7 +30,7 @@ const ManageRequests = () => {
                 if (err.response && err.response.status === 404 && err.response.data.message === "No requests found for this provider") {
                     setError("No requests yet."); // Display "No requests yet" if no requests are found
                 } else {
-                    setError("Failed to fetch requests. Please try again."); // Handle other errors
+                    setError("Failed to fetch requests. Please try again.");
                 }
             } finally {
                 setLoading(false);
@@ -45,12 +45,26 @@ const ManageRequests = () => {
         if (!confirmAction) return;
 
         try {
-            const response = await API.patch(`/v1/requests/${requestId}`, { status: action });
+            // Ensure the action is valid
+            if (!["accepted", "declined"].includes(action)) {
+                toast.error("Invalid action.");
+                return;
+            }
 
+            // Send a PATCH request to update the request status
+            // eslint-disable-next-line no-unused-vars
+            const response = await API.patch(`/api/v1/requests/${requestId}/status`, { status: action });
+
+            // Handle success
             toast.success(`Request ${action} successfully!`);
             setRequests((prev) => prev.filter((request) => request._id !== requestId));
         } catch (err) {
-            toast.error(`Failed to ${action} request. Please try again.`);
+            // Handle errors
+            if (err.response && err.response.data && err.response.data.message) {
+                toast.error(err.response.data.message);
+            } else {
+                toast.error(`Failed to ${action} request. Please try again.`);
+            }
         }
     };
 

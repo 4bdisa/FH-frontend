@@ -24,8 +24,8 @@ export function JobPostFlow() {
           setCoordinates({ latitude, longitude }); // Store coordinates in state
           setLoading(true);
 
-          // Fetch providers
-          const jobResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
+          // Fetch providers without saving the job
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/search-providers`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -38,13 +38,12 @@ export function JobPostFlow() {
             }),
           });
 
-          if (!jobResponse.ok) {
-            throw new Error(`HTTP error! status: ${jobResponse.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
 
-          const jobData = await jobResponse.json();
-          console.log("Job Data:", jobData); // Debugging
-          setProviders(jobData.providers || []);
+          const data = await response.json();
+          setProviders(data.providers || []);
           setStep(2); // Move to Step 2
         });
       } else {
@@ -62,30 +61,28 @@ export function JobPostFlow() {
     try {
       setLoading(true);
 
-      console.log("Creating service request with providerId:", providerId);
-
-      const requestResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/requests`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/select-provider`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify({
-          category: jobDetails.category,
+          providerId,
           description: jobDetails.description,
-          providerId, // Selected provider
-          location: { type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] }, // Use state
+          category: jobDetails.category,
+          location: { type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] },
           budget: jobDetails.budget,
           isFixedPrice: jobDetails.isFixedPrice,
         }),
       });
 
-      if (!requestResponse.ok) {
-        throw new Error(`HTTP error! status: ${requestResponse.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const requestData = await requestResponse.json();
-      console.log("Service Request Created:", requestData);
+      const data = await response.json();
+      console.log("Service Request Created:", data);
 
       setStep(3); // Move to the confirmation step
     } catch (error) {
