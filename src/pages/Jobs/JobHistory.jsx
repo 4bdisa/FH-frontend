@@ -5,6 +5,8 @@ const JobHistory = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [selectedRequestId, setSelectedRequestId] = useState(null);
 
     useEffect(() => {
         const fetchJobHistory = async () => {
@@ -22,6 +24,36 @@ const JobHistory = () => {
         fetchJobHistory();
     }, []);
 
+    const handleDelete = async () => {
+        try {
+            const response = await API.delete(`/api/v1/requests/${selectedRequestId}`);
+
+            if (response.status === 200) {
+                setRequests((prevRequests) =>
+                    prevRequests.filter((request) => request._id !== selectedRequestId)
+                );
+                setShowModal(false);
+                alert("Request deleted successfully.");
+            } else {
+                throw new Error("Failed to delete the request.");
+            }
+        } catch (err) {
+            console.error("Error deleting request:", err);
+            const errorMessage = err.response?.data?.message || "Failed to delete the request. Please try again.";
+            alert(errorMessage);
+        }
+    };
+
+    const openModal = (requestId) => {
+        setSelectedRequestId(requestId);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setSelectedRequestId(null);
+    };
+
     if (loading) {
         return <div className="text-center">Loading job history...</div>;
     }
@@ -38,10 +70,28 @@ const JobHistory = () => {
             ) : (
                 <ul className="space-y-4">
                     {requests.map((request) => (
-                        <li key={request._id} className="p-4 border rounded-md flex justify-between items-center">
+                        <li
+                            key={request._id}
+                            className="p-4 border rounded-md flex justify-between items-center relative"
+                        >
+                            {/* Delete Button */}
+                            <button
+                                onClick={() => openModal(request._id)}
+                                className="absolute top-2 right-2"
+                                title="Delete Request"
+                            >
+                                <img
+                                    src="https://img.icons8.com/?size=100&id=67884&format=png&color=000000"
+                                    alt="Delete Icon"
+                                    className="h-5 w-5"
+                                />
+                            </button>
+
                             {/* Left Section: Request Details */}
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-800">{request.category}</h2>
+                                <h2 className="text-lg font-semibold text-gray-800">
+                                    {request.category}
+                                </h2>
                                 <p className="text-gray-600">{request.description}</p>
                                 <p
                                     className={`mt-2 font-medium ${request.status === "accepted"
@@ -51,7 +101,9 @@ const JobHistory = () => {
                                             : "text-yellow-600"
                                         }`}
                                 >
-                                    Status: {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                    Status:{" "}
+                                    {request.status.charAt(0).toUpperCase() +
+                                        request.status.slice(1)}
                                 </p>
                             </div>
 
@@ -63,7 +115,9 @@ const JobHistory = () => {
                                             src={request.providerId.photo}
                                             alt={request.providerId.name}
                                             className="w-10 h-10 rounded-full"
-                                            onError={(e) => (e.target.src = "/default-avatar.png")} // Fallback on error
+                                            onError={(e) =>
+                                                (e.target.src = "/default-avatar.png")
+                                            } // Fallback on error
                                         />
                                         {!request.providerId.photo && (
                                             <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-full"></div> // Placeholder
@@ -77,6 +131,35 @@ const JobHistory = () => {
                         </li>
                     ))}
                 </ul>
+            )}
+
+            {/* Confirmation Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                            Confirm Deletion
+                        </h2>
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete this request? This action cannot be
+                            undone.
+                        </p>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={closeModal}
+                                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
