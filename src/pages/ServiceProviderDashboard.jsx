@@ -119,7 +119,7 @@ const ServiceProviderDashboard = () => {
                         </li>
                         <li>
                             <Link
-                                to="/service-provider-dashboard/job-history"
+                                to="/service-provider-dashboard/AcceptedJobs"
                                 className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
                             >
                                 <svg

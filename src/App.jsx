@@ -19,7 +19,7 @@ import ManageRequests from "./pages/Provider/ManageRequests";
 import BrowseServices from "./pages/BrowseServices";
 import JobHistory from "./pages/Jobs/JobHistory";
 import AcceptedJobs from "./pages/Jobs/acceptedJobs";
-
+import ChangeStateAndReview from "./pages/Jobs/ChangeStateAndReview";
 const App = () => (
   <Router>
     <Routes>
@@ -38,7 +38,7 @@ const App = () => (
           <Route index element={<ManageRequests />} />
           <Route path="profile-update" element={<ServiceProviderProfileUpdate />} />
           <Route path="manage-services" element={<ManageRequests />} />
-          <Route path="job-history" element={<AcceptedJobs />} /> {/* Add this line */}
+          <Route path="AcceptedJobs" element={<AcceptedJobs />} /> {/* Add this line */}
         </Route>
       </Route>
 
@@ -47,7 +47,8 @@ const App = () => (
           <Route index element={<BrowseServices />} />
           <Route path="profile-update" element={<CustomerProfileUpdate />} />
           <Route path="job-history" element={<JobHistory />} />
-          <Route path="post-job" element={<JobPostFlow />} /> {/* Add this line */}
+          <Route path="post-job" element={<JobPostFlow />} />
+          <Route path="/customer-dashboard/job-history/:requestId/review" element={<ChangeStateAndReview />} />
         </Route>
         <Route path="/dashboard/jobs/post" element={<JobPostFlow />} />
       </Route>
