@@ -18,6 +18,7 @@ import CustomerProfileUpdate from "./pages/Profile/CustomerProfileUpdate";
 import ManageRequests from "./pages/Provider/ManageRequests";
 import BrowseServices from "./pages/BrowseServices";
 import JobHistory from "./pages/Jobs/JobHistory";
+import AcceptedJobs from "./pages/Jobs/acceptedJobs";
 
 const App = () => (
   <Router>
@@ -37,6 +38,7 @@ const App = () => (
           <Route index element={<ManageRequests />} />
           <Route path="profile-update" element={<ServiceProviderProfileUpdate />} />
           <Route path="manage-services" element={<ManageRequests />} />
+          <Route path="job-history" element={<AcceptedJobs />} /> {/* Add this line */}
         </Route>
       </Route>
 

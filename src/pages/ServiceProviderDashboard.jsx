@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import API from "../services/api";
 
 const ServiceProviderDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
@@ -10,12 +11,31 @@ const ServiceProviderDashboard = () => {
 
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [acceptedRequests, setAcceptedRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         navigate("/pages/SignIn");
     };
+
+    useEffect(() => {
+        const fetchAcceptedRequests = async () => {
+            try {
+                const response = await API.get("/api/v1/requests/accepted");
+                setAcceptedRequests(response.data.data);
+            } catch (err) {
+                console.error("Error fetching accepted requests:", err);
+                setError("Failed to fetch accepted requests. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAcceptedRequests();
+    }, []);
 
     return (
         <div className="flex min-h-screen bg-blue-50">
@@ -97,6 +117,28 @@ const ServiceProviderDashboard = () => {
                                 Manage Services
                             </Link>
                         </li>
+                        <li>
+                            <Link
+                                to="/service-provider-dashboard/job-history"
+                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
+                            >
+                                <svg
+                                    className="w-5 h-5 mr-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 4v16m8-8H4"
+                                    ></path>
+                                </svg>
+                                Job History
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
             </aside>
@@ -161,7 +203,7 @@ const ServiceProviderDashboard = () => {
 
                 {/* Dynamic Content */}
                 <main className="flex-1 p-6">
-                    <Outlet />
+                    <Outlet /> {/* This renders the child routes */}
                 </main>
             </div>
         </div>
