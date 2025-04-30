@@ -11,4 +11,9 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
+// Function to mark a job as completed and submit a review
+export const completeRequest = async (requestId, data) => {
+  return API.patch(`api/v1/requests/complete/${requestId}`, data);
+};
+
 export default API;

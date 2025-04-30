@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import API from "../../services/api";
+import { completeRequest } from "../../services/api";
 
 const ChangeStateAndReview = () => {
     const { requestId } = useParams(); // Get the request ID from the URL
@@ -19,10 +19,7 @@ const ChangeStateAndReview = () => {
         }
 
         try {
-            await API.patch(`/api/v1/requests/${requestId}/complete`, {
-                rating,
-                review,
-            });
+           await completeRequest(requestId, { rating, comment: review });
 
             alert("Job marked as completed and feedback submitted successfully!");
             navigate("/customer-dashboard/job-history");
@@ -39,6 +36,7 @@ const ChangeStateAndReview = () => {
             </h1>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <form onSubmit={handleSubmit}>
+                {/* Rating Section */}
                 <div className="mb-4">
                     <label className="block text-gray-700 font-medium mb-2">
                         Rating (Required)
@@ -57,18 +55,29 @@ const ChangeStateAndReview = () => {
                         <option value={5}>5 - Excellent</option>
                     </select>
                 </div>
+
+                {/* Review Section */}
                 <div className="mb-4">
                     <label className="block text-gray-700 font-medium mb-2">
                         Review (Optional)
                     </label>
-                    <textarea
-                        value={review}
-                        onChange={(e) => setReview(e.target.value)}
-                        className="w-full p-2 border rounded-md"
-                        rows="4"
-                        placeholder="Write your review here..."
-                    ></textarea>
+                    <div className="flex items-start space-x-4">
+                        <img
+                            src="https://via.placeholder.com/40"
+                            alt="User Avatar"
+                            className="w-10 h-10 rounded-full"
+                        />
+                        <textarea
+                            value={review}
+                            onChange={(e) => setReview(e.target.value)}
+                            className="w-full p-2 border rounded-md"
+                            rows="4"
+                            placeholder="Write your review here..."
+                        ></textarea>
+                    </div>
                 </div>
+
+                {/* Submit Button */}
                 <div className="flex justify-end">
                     <button
                         type="submit"

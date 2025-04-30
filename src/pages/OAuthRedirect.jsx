@@ -27,8 +27,6 @@ const OAuthRedirect = () => {
             )
           );
 
-          console.log("User data stored in localStorage:", parsedUser);
-
           // Redirect based on the user's role
           if (parsedUser.role === "service_provider") {
             navigate("/service-provider-dashboard");
