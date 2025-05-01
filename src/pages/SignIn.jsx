@@ -17,32 +17,29 @@ const SignIn = () => {
     e.preventDefault();
 
     try {
-      // Destructure the response you expect from the backend
       const { token, user } = await loginUser({
         email: formData.email,
         password: formData.password,
       });
 
-      // Store the token and user data in localStorage
+      // Save token and user details in local storage
       localStorage.setItem("authToken", token);
       localStorage.setItem(
         "user",
         JSON.stringify({
+          id: user.id,
           name: user.name,
           email: user.email,
-          profileImage: user.profileImage || "https://via.placeholder.com/40",
+          profileImage: user.profileImage,
           role: user.role,
         })
       );
-      localStorage.setItem("userId", user.id); // Ensure this is stored if available
 
-      // Redirect to the appropriate dashboard based on the user's role
+      // Redirect based on role
       if (user.role === "service_provider") {
         navigate("/service-provider-dashboard");
       } else if (user.role === "client") {
         navigate("/customer-dashboard");
-      } else {
-        navigate("/dashboard");
       }
     } catch (error) {
       setError(error.message || "Login failed. Please check your credentials.");
@@ -154,12 +151,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-
-
-
-
-
-
-
-
-

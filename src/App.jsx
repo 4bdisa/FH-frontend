@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./pages/SignIn";
@@ -23,7 +23,7 @@ import ChangeStateAndReview from "./pages/Jobs/ChangeStateAndReview";
 import ProviderJobHistory from "./pages/Jobs/ProviderJobHistory";
 
 const App = () => (
-  <Router>
+  <BrowserRouter>
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
@@ -61,7 +61,7 @@ const App = () => (
       </Route>
     </Routes>
     <ToastContainer position="top-right" autoClose={3000} />
-  </Router>
+  </BrowserRouter>
 );
 
 export default App;

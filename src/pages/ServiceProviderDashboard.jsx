@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import API from "../services/api";
 
 const ServiceProviderDashboard = () => {
@@ -10,8 +10,9 @@ const ServiceProviderDashboard = () => {
     };
 
     const navigate = useNavigate();
+    const location = useLocation();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [acceptedRequests, setAcceptedRequests] = useState([]);
+    const [recentJobs, setRecentJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -22,19 +23,22 @@ const ServiceProviderDashboard = () => {
     };
 
     useEffect(() => {
-        const fetchAcceptedRequests = async () => {
+        const fetchRecentJobs = async () => {
             try {
-                const response = await API.get("/api/v1/requests/accepted");
-                setAcceptedRequests(response.data.data);
+                const response = await API.get("/api/v1/requests/provider/history");
+                const completedJobs = response.data.data.filter(
+                    (job) => job.status === "completed"
+                );
+                setRecentJobs(completedJobs.slice(0, 3)); // Show only the 3 most recent completed jobs
             } catch (err) {
-                console.error("Error fetching accepted requests:", err);
-                setError("Failed to fetch accepted requests. Please try again.");
+                console.error("Error fetching recent jobs:", err);
+                setError("Failed to fetch recent jobs. Please try again.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAcceptedRequests();
+        fetchRecentJobs();
     }, []);
 
     return (
@@ -119,7 +123,7 @@ const ServiceProviderDashboard = () => {
                         </li>
                         <li>
                             <Link
-                                to="/service-provider-dashboard/AcceptedJobs"
+                                to="/service-provider-dashboard/job-history"
                                 className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
                             >
                                 <svg
@@ -148,7 +152,7 @@ const ServiceProviderDashboard = () => {
                 {/* Header */}
                 <header className="flex items-center justify-between bg-white shadow p-4">
                     <h1 className="text-xl font-semibold text-blue-600">
-                        Service Provider Dashboard
+                        Welcome, {user.name}!
                     </h1>
                     <div className="relative">
                         <div
@@ -203,7 +207,46 @@ const ServiceProviderDashboard = () => {
 
                 {/* Dynamic Content */}
                 <main className="flex-1 p-6">
-                    <Outlet /> {/* This renders the child routes */}
+                    {/* Show recently completed jobs only on the main dashboard route */}
+                    {location.pathname === "/service-provider-dashboard" && (
+                        <>
+                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                                Recently Completed Jobs
+                            </h2>
+                            {loading ? (
+                                <div className="text-center">Loading recent jobs...</div>
+                            ) : error ? (
+                                <div className="text-center text-red-500">{error}</div>
+                            ) : recentJobs.length === 0 ? (
+                                <p className="text-gray-600">No completed jobs available.</p>
+                            ) : (
+                                <ul className="space-y-4">
+                                    {recentJobs.map((job) => (
+                                        <li key={job._id} className="p-4 border rounded-md bg-white shadow">
+                                            <h3 className="text-lg font-semibold text-gray-800">{job.category}</h3>
+                                            <p className="text-gray-600">{job.description}</p>
+                                            <p className="text-sm text-gray-500">
+                                                Completed on: {new Date(job.updatedAt).toLocaleDateString()}
+                                            </p>
+                                            {job.reviewId && (
+                                                <div className="mt-2">
+                                                    <p className="text-sm font-medium text-gray-700">Customer Review:</p>
+                                                    <p className="text-gray-600 italic">
+                                                        "{job.reviewId.comment || "No comment provided."}"
+                                                    </p>
+                                                    <p className="text-yellow-500">
+                                                        {"★".repeat(job.reviewId.rating)}
+                                                        {"☆".repeat(5 - job.reviewId.rating)}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
+                    )}
+                    <Outlet />
                 </main>
             </div>
         </div>

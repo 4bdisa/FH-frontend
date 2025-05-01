@@ -10,7 +10,7 @@ const ProviderJobHistory = () => {
         const fetchProviderJobHistory = async () => {
             try {
                 const response = await API.get("/api/v1/requests/provider/history");
-                console.log("Provider Job History Response:", response.data.data);
+                
                 setRequests(response.data.data);
             } catch (err) {
                 console.error("Error fetching provider job history:", err);

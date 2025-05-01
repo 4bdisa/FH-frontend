@@ -6,42 +6,42 @@ const OAuthRedirect = () => {
 
   useEffect(() => {
     const handleRedirect = async () => {
-      const query = new URLSearchParams(window.location.search);
-      const token = query.get("token");
-      const user = query.get("user");
+      const queryParams = new URLSearchParams(window.location.search);
+      const token = queryParams.get("token");
+      const user = queryParams.get("user");
 
       if (token && user) {
+        let parsedUser;
         try {
-          // Parse the user object from the query string
-          const parsedUser = JSON.parse(user);
-
-          // Store the token and user in localStorage
-          await Promise.resolve(localStorage.setItem("authToken", token));
-          await Promise.resolve(
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                ...parsedUser,
-                profileImage: parsedUser.profileImage || "https://placekitten.com/40/40",
-              })
-            )
-          );
-
-          // Redirect based on the user's role
-          if (parsedUser.role === "service_provider") {
-            navigate("/service-provider-dashboard");
-          } else if (parsedUser.role === "client") {
-            navigate("/customer-dashboard");
-          } else {
-            console.error("Unknown user role:", parsedUser.role);
-            navigate("/pages/SignIn"); // Redirect to login if role is unknown
-          }
+          parsedUser = JSON.parse(user);
         } catch (error) {
-          console.error("Error during OAuth redirect:", error);
-          navigate("/pages/SignIn"); // Redirect to login on error
+          console.error("Error parsing user data:", error);
+          navigate("/pages/SignIn");
+          return;
+        }
+
+        // Save token and user details in local storage
+        localStorage.setItem("authToken", token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: parsedUser.id,
+            name: parsedUser.name,
+            email: parsedUser.email,
+            profileImage: parsedUser.profileImage,
+            role: parsedUser.role,
+          })
+        );
+
+        // Redirect based on role
+        if (parsedUser.role === "service_provider") {
+          setTimeout(() => navigate("/service-provider-dashboard"), 0);
+        } else if (parsedUser.role === "client") {
+          setTimeout(() => navigate("/customer-dashboard"), 0);
+        } else {
+          setTimeout(() => navigate("/pages/SignIn"), 0);
         }
       } else {
-        // Redirect to login if token or user is missing
         navigate("/pages/SignIn");
       }
     };
