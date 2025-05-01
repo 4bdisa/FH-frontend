@@ -37,7 +37,6 @@ const App = () => (
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["service_provider"]} />}>
         <Route path="/service-provider-dashboard" element={<ServiceProviderDashboard />}>
-          <Route index element={<ManageRequests />} />
           <Route path="profile-update" element={<ServiceProviderProfileUpdate />} />
           <Route path="manage-services" element={<ManageRequests />} />
           <Route path="AcceptedJobs" element={<AcceptedJobs />} />
