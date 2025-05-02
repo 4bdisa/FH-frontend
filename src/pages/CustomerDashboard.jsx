@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const CustomerDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
@@ -10,11 +11,34 @@ const CustomerDashboard = () => {
 
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [fhCoins, setFhCoins] = useState(0); // State to store fh-coin balance
+
+    // Fetch fh-coin balance from the database
+    useEffect(() => {
+        const fetchFhCoins = async () => {
+            try {
+                const response = await axios.get("/api/users/fh-coins", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                });
+                setFhCoins(response.data.fhCoins); // Set the fh-coin balance
+            } catch (err) {
+                console.error("Error fetching fh-coin balance:", err);
+            }
+        };
+
+        fetchFhCoins();
+    }, []);
 
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         navigate("/pages/SignIn");
+    };
+
+    const handleDeposit = () => {
+        navigate("/customer-dashboard/deposit");
     };
 
     return (
@@ -119,7 +143,6 @@ const CustomerDashboard = () => {
                                 Job History
                             </Link>
                         </li>
-                      
                     </ul>
                 </nav>
             </aside>
@@ -160,6 +183,19 @@ const CustomerDashboard = () => {
                                         </h3>
                                         <p className="text-sm text-gray-500">{user.email}</p>
                                     </div>
+                                </div>
+
+                                {/* FH-Coin Balance */}
+                                <div className="p-4 border-t border-gray-200">
+                                    <p className="text-sm font-medium text-gray-700">
+                                        FH-Coin Balance: <span className="text-blue-600">{fhCoins}</span>
+                                    </p>
+                                    <button
+                                        onClick={handleDeposit}
+                                        className="mt-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                                    >
+                                        Deposit
+                                    </button>
                                 </div>
 
                                 {/* Actions */}
