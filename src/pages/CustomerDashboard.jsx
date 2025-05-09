@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API from "../services/api";
 
 const CustomerDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
         name: "Customer",
         email: "customer@example.com",
-        profileImage: "https://via.placeholder.com/40",
+        profileImage: "https://img.icons8.com/?size=100&id=25224&format=png&color=000000",
     };
 
     const navigate = useNavigate();
@@ -17,14 +18,25 @@ const CustomerDashboard = () => {
     useEffect(() => {
         const fetchFhCoins = async () => {
             try {
-                const response = await axios.get("/api/users/fh-coins", {
+                const response = await API.get("/api/user/fh-coins", {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
                     },
                 });
-                setFhCoins(response.data.fhCoins); // Set the fh-coin balance
+
+                if (response.status === 200) {
+                    setFhCoins(response.data.fhCoins); // Update state with fh-coin balance
+                } else {
+                    console.error("Unexpected response status:", response.status);
+                }
             } catch (err) {
-                console.error("Error fetching fh-coin balance:", err);
+                if (err.response) {
+                    console.error("Error fetching fh-coin balance:", err.response.data);
+                } else if (err.request) {
+                    console.error("No response received:", err.request);
+                } else {
+                    console.error("Error:", err.message);
+                }
             }
         };
 
@@ -160,11 +172,16 @@ const CustomerDashboard = () => {
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             <span className="text-gray-700">{user.name}</span>
-                            <img
-                                src={user.profileImage}
-                                alt="User Profile"
-                                className="w-10 h-10 rounded-full"
-                            />
+                            {user.profileImage ? (
+                                <img
+                                    src={user.profileImage}
+                                    alt="User Profile"
+                                    className="w-10 h-10 rounded-full"
+                                    onError={(e) => (e.target.src = "https://img.icons8.com/?size=100&id=25224&format=png&color=000000")}
+                                />
+                            ) : (
+                                <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+                            )}
                         </div>
                         {isDropdownOpen && (
                             <div
@@ -228,3 +245,5 @@ const CustomerDashboard = () => {
 };
 
 export default CustomerDashboard;
+
+<link rel="preload" as="image" href="https://img.icons8.com/?size=100&id=25224&format=png&color=000000"></link>

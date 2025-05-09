@@ -57,7 +57,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
       // Check the response and redirect to the dashboard if successful
       if (response.status === 200) {
-        console.log('Registration successful:', response.data);
+        
         // Redirect to the dashboard after successful registration
         navigate('/oauth/callback'); // Adjust the dashboard URL as needed
       } else {

@@ -82,7 +82,7 @@ export function JobPostFlow() {
       }
 
       const data = await response.json();
-      console.log("Service Request Created:", data);
+
 
       setStep(3); // Move to the confirmation step
     } catch (error) {
@@ -96,7 +96,9 @@ export function JobPostFlow() {
   const sortedProviders = [...providers].sort((a, b) => {
     if (sort === 'rating') return b.rating - a.rating;
     if (sort === 'price') return a.hourlyRate - b.hourlyRate;
-    if (sort === 'experience') return b.completedJobs - a.completedJobs;
+    if (sort === 'experience') return b.experience - a.experience; // Sort by experience
+    if (sort === 'completedJobs') return b.completedJobs - a.completedJobs; // Sort by completed jobs
+    if (sort === 'distance') return a.distance - b.distance;
     return 0;
   });
 
@@ -197,10 +199,10 @@ export function JobPostFlow() {
               Sort by Price
             </button>
             <button
-              onClick={() => setSort("experience")}
+              onClick={() => setSort("completedJobs")}
               className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
             >
-              Sort by Experience
+              Sort by completed Jobs
             </button>
           </div>
 
@@ -221,6 +223,9 @@ export function JobPostFlow() {
                   <p className="text-sm text-gray-700">
                     Completed Jobs: {provider.completedJobs}
                   </p>
+                  <p className="text-sm text-gray-700">
+                    Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} km
+                  </p> {/* Display distance in kilometers */}
                   <button
                     onClick={() => handleProviderSelect(provider._id)}
                     className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"

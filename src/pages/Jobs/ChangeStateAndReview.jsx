@@ -63,7 +63,7 @@ const ChangeStateAndReview = () => {
                     </label>
                     <div className="flex items-start space-x-4">
                         <img
-                            src="https://via.placeholder.com/40"
+                            src="https://img.icons8.com/?size=100&id=25224&format=png&color=000000"
                             alt="User Avatar"
                             className="w-10 h-10 rounded-full"
                         />

@@ -52,7 +52,7 @@ const ClientRegistrationForm = () => {
       );
 
       if (response.status === 200) {
-        console.log('Registration successful:', response.data);
+        
         navigate('/oauth/callback'); // Adjust the redirect URL as needed
       } else {
         alert(response.data.error || 'Registration failed');

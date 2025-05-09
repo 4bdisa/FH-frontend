@@ -6,7 +6,7 @@ const ServiceProviderDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
         name: "Service Provider",
         email: "provider@example.com",
-        profileImage: "https://via.placeholder.com/40",
+        profileImage: "https://img.icons8.com/?size=100&id=25224&format=png&color=000000",
     };
 
     const navigate = useNavigate();

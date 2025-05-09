@@ -6,7 +6,7 @@ const Dashboard = () => {
     || {
       name: "John Doe",
       email: "johndoe@gmail.com",
-      profileImage: "https://via.placeholder.com/40",
+      profileImage: "https://img.icons8.com/?size=100&id=25224&format=png&color=000000",
    };
    const navigate = useNavigate();
    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
