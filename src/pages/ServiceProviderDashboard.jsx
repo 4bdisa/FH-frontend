@@ -15,6 +15,7 @@ const ServiceProviderDashboard = () => {
     const [recentJobs, setRecentJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [requestCount, setRequestCount] = useState(0); // State to store the number of requests
 
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
@@ -38,7 +39,21 @@ const ServiceProviderDashboard = () => {
             }
         };
 
+        const fetchRequestCount = async () => {
+            try {
+                const response = await API.get("/api/v1/provider/count", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                });
+                setRequestCount(response.data.count || 0); // Set the request count
+            } catch (err) {
+                console.error("Error fetching request count:", err);
+            }
+        };
+
         fetchRecentJobs();
+        fetchRequestCount();
     }, []);
 
     return (
@@ -102,7 +117,7 @@ const ServiceProviderDashboard = () => {
                         <li>
                             <Link
                                 to="/service-provider-dashboard/manage-services"
-                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
+                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md relative"
                             >
                                 <svg
                                     className="w-5 h-5 mr-3"
@@ -119,6 +134,11 @@ const ServiceProviderDashboard = () => {
                                     ></path>
                                 </svg>
                                 Manage Services
+                                {requestCount > 0 && (
+                                    <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        {requestCount}
+                                    </span>
+                                )}
                             </Link>
                         </li>
                         <li>

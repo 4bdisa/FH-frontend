@@ -1,17 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 
 export function JobPostFlow() {
   const [step, setStep] = useState(1);
-  const [jobDetails, setJobDetails] = useState({ description: '', category: '' });
+  const [jobDetails, setJobDetails] = useState({ description: "", category: "" });
+  const [categories, setCategories] = useState([]); // State to hold categories
   const [providers, setProviders] = useState([]);
-  const [sort, setSort] = useState('');
-  const [error, setError] = useState(''); // Add error state for validation
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [sort, setSort] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [coordinates, setCoordinates] = useState({ longitude: null, latitude: null });
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/categories`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setCategories(data.categories || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        alert("Failed to fetch categories. Please try again.");
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleJobDetailsSubmit = async () => {
     if (!jobDetails.description.trim()) {
       setError("Description is required");
+      return;
+    }
+
+    if (!jobDetails.category.trim()) {
+      setError("Category is required");
       return;
     }
 
@@ -21,10 +54,9 @@ export function JobPostFlow() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const { latitude, longitude } = position.coords;
-          setCoordinates({ latitude, longitude }); // Store coordinates in state
+          setCoordinates({ latitude, longitude });
           setLoading(true);
 
-          // Fetch providers without saving the job
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/search-providers`, {
             method: "POST",
             headers: {
@@ -44,7 +76,7 @@ export function JobPostFlow() {
 
           const data = await response.json();
           setProviders(data.providers || []);
-          setStep(2); // Move to Step 2
+          setStep(2);
         });
       } else {
         alert("Geolocation is not supported by your browser.");
@@ -83,7 +115,6 @@ export function JobPostFlow() {
 
       const data = await response.json();
 
-
       setStep(3); // Move to the confirmation step
     } catch (error) {
       console.error("Error creating service request:", error);
@@ -94,11 +125,11 @@ export function JobPostFlow() {
   };
 
   const sortedProviders = [...providers].sort((a, b) => {
-    if (sort === 'rating') return b.rating - a.rating;
-    if (sort === 'price') return a.hourlyRate - b.hourlyRate;
-    if (sort === 'experience') return b.experience - a.experience; // Sort by experience
-    if (sort === 'completedJobs') return b.completedJobs - a.completedJobs; // Sort by completed jobs
-    if (sort === 'distance') return a.distance - b.distance;
+    if (sort === "rating") return b.rating - a.rating;
+    if (sort === "price") return a.hourlyRate - b.hourlyRate;
+    if (sort === "experience") return b.experience - a.experience; // Sort by experience
+    if (sort === "completedJobs") return b.completedJobs - a.completedJobs; // Sort by completed jobs
+    if (sort === "distance") return a.distance - b.distance;
     return 0;
   });
 
@@ -109,6 +140,24 @@ export function JobPostFlow() {
           <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">
             Post a Job
           </h2>
+
+          {/* Dropdown for Categories */}
+          <select
+            value={jobDetails.category}
+            onChange={(e) => setJobDetails({ ...jobDetails, category: e.target.value })}
+            className="w-full p-3 border border-blue-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select a Category
+            </option>
+            {categories.map((category, index) => (
+              <option key={index} value={category.category}>
+                {category.category}
+              </option>
+            ))}
+          </select>
+
+          {/* Job Description */}
           <textarea
             placeholder="Enter job description..."
             value={jobDetails.description}
@@ -117,21 +166,15 @@ export function JobPostFlow() {
             }
             className="w-full p-3 border border-blue-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {/* Display error message if description is empty */}
+
+          {/* Error Message */}
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          <input
-            type="text"
-            placeholder="Enter job category (e.g., Plumber, Electrician)"
-            value={jobDetails.category}
-            onChange={(e) =>
-              setJobDetails({ ...jobDetails, category: e.target.value })
-            }
-            className="w-full p-3 border border-blue-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+
+          {/* Submit Button */}
           <button
             onClick={handleJobDetailsSubmit}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -158,7 +201,7 @@ export function JobPostFlow() {
                 Loading...
               </div>
             ) : (
-              'Find Providers'
+              "Find Providers"
             )}
           </button>
         </div>

@@ -49,8 +49,35 @@ const CustomerDashboard = () => {
         navigate("/pages/SignIn");
     };
 
-    const handleDeposit = () => {
-        navigate("/customer-dashboard/deposit");
+    const handleDeposit = async () => {
+        const totalAmount = prompt("Enter the amount to deposit (in ETB):");
+
+        if (!totalAmount || isNaN(totalAmount) || totalAmount <= 0) {
+            alert("Please enter a valid amount.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/transactions/create`,
+                { totalAmount },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                }
+            );
+
+            if (response.data.success) {
+                // Redirect to Chapa checkout page
+                window.location.href = response.data.checkoutUrl;
+            } else {
+                alert("Failed to initialize payment. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error initializing payment:", error);
+            alert("An error occurred. Please try again.");
+        }
     };
 
     return (
