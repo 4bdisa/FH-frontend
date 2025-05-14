@@ -2,55 +2,56 @@ import React, { useState } from "react";
 
 const ServiceProviderProfileUpdate = () => {
     const [formData, setFormData] = useState({
-            skills: "",
-            keywords: "",
-            country: "",
-            workDays: "",
-            experienceYears: "",
-            homeService: false,
+        skills: "",
+        keywords: "",
+        country: "",
+        workDays: "",
+        experienceYears: "",
+        homeService: false,
+        phoneNumber: "", // Added phoneNumber attribute
+    });
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value,
         });
-    
-        const handleChange = (e) => {
-            const { name, value, type, checked } = e.target;
-            setFormData({
-                ...formData,
-                [name]: type === "checkbox" ? checked : value,
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/update`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                },
+                body: JSON.stringify(formData), // Include phoneNumber in the request body
             });
-        };
-    
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/update`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-                    },
-                    body: JSON.stringify(formData),
-                });
-    
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-    
-                const updatedUser = await response.json();
-    
-                // Update localStorage with the new user data
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify({
-                        ...JSON.parse(localStorage.getItem("user")), // Keep existing data
-                        ...updatedUser.user, // Merge updated data
-                    })
-                );
-    
-                alert("Profile updated successfully!");
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("Failed to update profile. Please try again.");
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
+
+            const updatedUser = await response.json();
+
+            // Update localStorage with the new user data
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    ...JSON.parse(localStorage.getItem("user")), // Keep existing data
+                    ...updatedUser.user, // Merge updated data
+                })
+            );
+
+            alert("Profile updated successfully!");
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("Failed to update profile. Please try again.");
+        }
+    };
 
     return (
         <div className="min-h-screen bg-blue-50 flex items-center justify-center p-6">
@@ -115,6 +116,17 @@ const ServiceProviderProfileUpdate = () => {
                         value={formData.experienceYears}
                         onChange={handleChange}
                         placeholder="e.g., 5"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
+                    <input
+                        type="text"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        placeholder="e.g., +1234567890"
                         className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
