@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import API from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import JobHistoryBox from "./JobHistoryBox";
 
 const JobHistory = () => {
     const [requests, setRequests] = useState([]);
@@ -48,12 +49,12 @@ const JobHistory = () => {
         }
     };
 
-    const handleGetContact = async () => {
+    const handleGetContact = useCallback(async () => {
         try {
             setIsPaying(true);
 
             // First check customer balance
-            const balanceResponse = await API.get("/api/v1/users/balance");
+            const balanceResponse = await API.get("/api/user/fh-coins");
             if (balanceResponse.data.balance < 5) {
                 alert("Insufficient FH-Coins. Please top up your balance.");
                 return;
@@ -63,7 +64,7 @@ const JobHistory = () => {
             const paymentResponse = await API.patch(`/api/v1/requests/${selectedRequest._id}/pay`);
 
             if (paymentResponse.data.success) {
-                // Update the request in state to mark as paid
+                // Update the requests state with the new paid value
                 setRequests(prevRequests =>
                     prevRequests.map(req =>
                         req._id === selectedRequest._id
@@ -82,17 +83,14 @@ const JobHistory = () => {
             setIsPaying(false);
             setShowContactModal(false);
         }
-    };
+    }, [selectedRequest]);
 
     const handleContactClick = (request) => {
         setSelectedRequest(request);
 
         if (request.paid) {
-            // Contact info is already paid for, no modal needed
             return;
         }
-
-        // Show payment confirmation modal
         setShowContactModal(true);
     };
 
@@ -127,114 +125,13 @@ const JobHistory = () => {
             ) : (
                 <ul className="space-y-4">
                     {requests.map((request) => (
-                        <li
-                            key={request._id}
-                            className={`p-4 border rounded-md flex flex-col justify-between items-start relative w-full max-w-5xl mx-auto ${request.status === "accepted" ? "cursor-pointer hover:shadow-blue-500/50 shadow-lg" : ""
-                                }`}
-                        >
-                            {/* Delete Button */}
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    openModal(request);
-                                }}
-                                className="absolute top-2 right-2"
-                                title="Delete Request"
-                            >
-                                <img
-                                    src="https://img.icons8.com/?size=100&id=67884&format=png&color=000000"
-                                    alt="Delete Icon"
-                                    className="h-5 w-5"
-                                />
-                            </button>
-
-                            {/* Request Details */}
-                            <div>
-                                <h2 className="text-lg font-semibold text-gray-800">{request.category}</h2>
-                                <p className="text-gray-600">{request.description}</p>
-                                <p
-                                    className={`mt-2 font-medium ${request.status === "accepted"
-                                        ? "text-green-600"
-                                        : request.status === "declined"
-                                            ? "text-red-600"
-                                            : request.status === "ongoing"
-                                                ? "text-blue-600"
-                                                : "text-yellow-600"
-                                        }`}
-                                >
-                                    Status: {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                </p>
-                                {/* Show rating and review if request is complete and review exists */}
-                                {request.status === "complete" && (request.rating || request.review) && (
-                                    <div className="mt-2 p-3 bg-blue-50 rounded-md w-full max-w-md">
-                                        {request.rating && (
-                                            <div className="flex items-center mb-1">
-                                                <span className="font-semibold text-blue-700 mr-2">Rating:</span>
-                                                <span className="text-yellow-500 font-bold">{request.rating} / 5</span>
-                                            </div>
-                                        )}
-                                        {request.review && (
-                                            <div>
-                                                <span className="font-semibold text-blue-700 mr-2">Review:</span>
-                                                <span className="text-gray-700">{request.review}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Provider Details */}
-                            {request.providerId && (
-                                <div className="flex items-center space-x-2 mt-4">
-                                    <div className="relative w-10 h-10">
-                                        <img
-                                            src={request.providerId.photo}
-                                            alt={request.providerId.name}
-                                            className="w-10 h-10 rounded-full"
-                                            onError={(e) => (e.target.src = "/default-avatar.png")}
-                                        />
-                                        {!request.providerId.photo && (
-                                            <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-full"></div>
-                                        )}
-                                    </div>
-                                    <span className="text-gray-700 text-sm">{request.providerId.name}</span>
-                                </div>
-                            )}
-
-                            {/* Contact Info Section */}
-                            {request.status === "accepted" && (
-                                <div className="mt-4">
-                                    {request.paid ? (
-                                        <div className="contact-info p-3 bg-gray-100 rounded-md">
-                                            <h3 className="font-semibold">Provider Contact:</h3>
-                                            <p>Name: {request.providerId.name}</p>
-                                            <p>Phone: {request.providerId.phoneNumber}</p>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleContactClick(request)}
-                                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-500"
-                                        >
-                                            Get Contact Info (5 FH-Coins)
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Change State and Review Button for Ongoing Requests */}
-                            {request.status === "ongoing" && (
-                                <div className="mt-4">
-                                    <button
-                                        onClick={() =>
-                                            navigate(`/customer-dashboard/job-history/${request._id}/review`)
-                                        }
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
-                                    >
-                                        Change State and Review
-                                    </button>
-                                </div>
-                            )}
-                        </li>
+                        <JobHistoryBox
+                            key={`${request._id}-${request.paid}`} // Add a key prop that includes the paid value
+                            request={request}
+                            openModal={openModal}
+                            handleContactClick={handleContactClick}
+                            navigate={navigate}
+                        />
                     ))}
                 </ul>
             )}
