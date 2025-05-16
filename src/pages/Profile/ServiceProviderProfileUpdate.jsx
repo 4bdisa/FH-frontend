@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import API from "../../../src/services/api.js"; // Import your API utility
 
 const ServiceProviderProfileUpdate = () => {
     const [formData, setFormData] = useState({
@@ -62,6 +65,23 @@ const ServiceProviderProfileUpdate = () => {
                 <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">
                     Update Profile
                 </h2>
+
+                {/* Avatar Section */}
+                <div className="flex justify-center mb-4">
+                    <div className="avatar">
+                        <div className="w-24 rounded-full">
+                            <img
+                                src={JSON.parse(localStorage.getItem("user"))?.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741702-a0cfae58b707.jpg"}
+                                alt="Profile"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "https://img.daisyui.com/images/stock/photo-1534528741702-a0cfae58b707.jpg";
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mb-4">
                     <label className="block text-gray-700 font-medium mb-2">Skills</label>
                     <input
@@ -121,12 +141,11 @@ const ServiceProviderProfileUpdate = () => {
                 </div>
                 <div className="mb-4">
                     <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
-                    <input
-                        type="text"
-                        name="phoneNumber"
+                    <PhoneInput
+                        international
+                        defaultCountry="US"
                         value={formData.phoneNumber}
-                        onChange={handleChange}
-                        placeholder="e.g., +1234567890"
+                        onChange={phone => setFormData({ ...formData, phoneNumber: phone })}
                         className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>

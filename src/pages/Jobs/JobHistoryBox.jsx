@@ -111,8 +111,8 @@ const JobHistoryBox = ({
                 </div>
             )}
 
-            {/* Change State and Review Button for Ongoing Requests */}
-            {request.status === "ongoing" && (
+            {/* Change State and Review Button for accepted Requests */}
+            {request.status === "accepted" && request.paid && (
                 <div className="mt-4 w-full">
                     <button
                         onClick={() =>
