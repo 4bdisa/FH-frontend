@@ -73,6 +73,7 @@ const ServiceProviderProfileUpdate = () => {
                             <img
                                 src={JSON.parse(localStorage.getItem("user"))?.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741702-a0cfae58b707.jpg"}
                                 alt="Profile"
+                                className="w-34 h-34 rounded-full border border-blue-200"
                                 onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.src = "https://img.daisyui.com/images/stock/photo-1534528741702-a0cfae58b707.jpg";

@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
 import { toast } from "react-toastify";
+import cloudinary from 'cloudinary-core';
 
 const ManageRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [mediaUrls, setMediaUrls] = useState({}); // Store media URLs by request ID
+
+    // Cloudinary configuration
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME; // Replace with your cloud name
+    const cl = new cloudinary.Cloudinary({ cloud_name: cloudName });
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -25,6 +31,19 @@ const ManageRequests = () => {
                     setError("No requests yet."); // Display "No requests yet" if no jobs are found
                 } else {
                     setRequests(response.data.data); // Set the requests if data is found
+
+                    // Generate Cloudinary URLs for each request
+                    const urls = {};
+                    response.data.data.forEach(request => {
+                        console.log("request.media:", request.media); // Check request.media
+
+                        if (request.media && request.media.length > 0) {
+                            urls[request._id] = request.media.map(publicId => cl.url(publicId));
+                        }
+                        console.log("urls[request._id]:", urls[request._id]); // Check generated URLs
+                    });
+                    setMediaUrls(urls);
+                    console.log("mediaUrls:", mediaUrls); // Check mediaUrls state
                 }
             } catch (err) {
                 if (err.response && err.response.status === 404 && err.response.data.message === "No requests found for this provider") {
@@ -92,6 +111,22 @@ const ManageRequests = () => {
                     {requests.map((request) => (
                         <li key={request._id} className="p-4 border rounded">
                             <h3 className="text-lg font-semibold">{request.category}</h3>
+
+                            {/* Display Uploaded Media */}
+                            {request.media && request.media.length > 0 && (
+                                <div className="mb-2 flex flex-wrap">
+                                    {request.media.map((url, index) => (
+                                        <div key={index} className="w-24 h-24 m-1 relative">
+                                            {url.match(/.(jpeg|jpg|gif|png)$/) ? (
+                                                <img src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" />
+                                            ) : (
+                                                <video src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" controls />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             <p>{request.description}</p>
                             <div className="mt-4 flex justify-end space-x-4">
                                 <button

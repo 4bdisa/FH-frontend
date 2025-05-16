@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import axios for making HTTP requests
 
 export function JobPostFlow() {
   const [step, setStep] = useState(1);
@@ -9,6 +10,12 @@ export function JobPostFlow() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [coordinates, setCoordinates] = useState({ longitude: null, latitude: null });
+  const [media, setMedia] = useState([]); // State to store uploaded media URLs
+  const [uploading, setUploading] = useState(false); // State to track uploading status
+
+  // Cloudinary configuration
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -36,6 +43,62 @@ export function JobPostFlow() {
 
     fetchCategories();
   }, []);
+
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    try {
+      setUploading(true);
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+        formData
+      );
+
+      if (response.status === 200) {
+        return response.data.secure_url;
+      } else {
+        console.error("Cloudinary upload failed:", response);
+        alert("Failed to upload media to Cloudinary.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+      alert("Failed to upload media to Cloudinary.");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleMediaUpload = async (e) => {
+    const files = Array.from(e.target.files); // Convert FileList to an array
+
+    if (files.length === 0) return;
+
+    setLoading(true); // Start loading
+
+    try {
+      const uploadPromises = files.map(async (file) => {
+        return await uploadToCloudinary(file);
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Filter out any failed uploads (null values)
+      const validUrls = uploadedUrls.filter(url => url !== null);
+
+      // Update the media state with validUrls
+      setMedia(validUrls);
+      console.log("Uploaded media URLs:", validUrls); // Log the uploaded URLs
+    } catch (error) {
+      console.error("Media upload error:", error);
+      alert("Failed to upload all media. Please try again.");
+    } finally {
+      setLoading(false); // End loading
+    }
+  };
 
   const handleJobDetailsSubmit = async () => {
     if (!jobDetails.description.trim()) {
@@ -67,6 +130,7 @@ export function JobPostFlow() {
               description: jobDetails.description,
               category: jobDetails.category,
               customerLocation: [longitude, latitude],
+              media: media, // Include media URLs in the request
             }),
           });
 
@@ -106,6 +170,7 @@ export function JobPostFlow() {
           location: { type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] },
           budget: jobDetails.budget,
           isFixedPrice: jobDetails.isFixedPrice,
+          media: media, // Include media URLs in the request
         }),
       });
 
@@ -140,6 +205,34 @@ export function JobPostFlow() {
           <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">
             Post a Job
           </h2>
+
+          {/* Media Upload */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Upload Photos/Videos
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleMediaUpload}
+              className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {uploading && <p className="text-gray-500">Uploading...</p>}
+            {media.length > 0 && (
+              <div className="mt-2 flex flex-wrap">
+                {media.map((url, index) => (
+                  <div key={index} className="w-24 h-24 m-1 relative">
+                    {url.match(/.(jpeg|jpg|gif|png)$/) ? (
+                      <img src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" />
+                    ) : (
+                      <video src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" controls />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Dropdown for Categories */}
           <select
