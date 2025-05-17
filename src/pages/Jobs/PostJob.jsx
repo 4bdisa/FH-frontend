@@ -91,7 +91,7 @@ export function JobPostFlow() {
 
       // Update the media state with validUrls
       setMedia(validUrls);
-      console.log("Uploaded media URLs:", validUrls); // Log the uploaded URLs
+      
     } catch (error) {
       console.error("Media upload error:", error);
       alert("Failed to upload all media. Please try again.");
@@ -119,7 +119,7 @@ export function JobPostFlow() {
           const { latitude, longitude } = position.coords;
           setCoordinates({ latitude, longitude });
           setLoading(true);
-
+          
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/search-providers`, {
             method: "POST",
             headers: {
@@ -130,7 +130,8 @@ export function JobPostFlow() {
               description: jobDetails.description,
               category: jobDetails.category,
               customerLocation: [longitude, latitude],
-              media: media, // Include media URLs in the request
+              media: media,
+              // Include media URLs in the request
             }),
           });
 
@@ -156,6 +157,7 @@ export function JobPostFlow() {
   const handleProviderSelect = async (providerId) => {
     try {
       setLoading(true);
+      
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/select-provider`, {
         method: "POST",

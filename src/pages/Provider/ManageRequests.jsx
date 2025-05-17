@@ -35,15 +35,15 @@ const ManageRequests = () => {
                     // Generate Cloudinary URLs for each request
                     const urls = {};
                     response.data.data.forEach(request => {
-                        console.log("request.media:", request.media); // Check request.media
+                        
 
                         if (request.media && request.media.length > 0) {
                             urls[request._id] = request.media.map(publicId => cl.url(publicId));
                         }
-                        console.log("urls[request._id]:", urls[request._id]); // Check generated URLs
+                        
                     });
                     setMediaUrls(urls);
-                    console.log("mediaUrls:", mediaUrls); // Check mediaUrls state
+                    
                 }
             } catch (err) {
                 if (err.response && err.response.status === 404 && err.response.data.message === "No requests found for this provider") {

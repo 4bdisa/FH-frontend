@@ -15,7 +15,7 @@ const CustomerProfileUpdate = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Updated Customer Profile:", formData);
+        
         // Add API call to update profile
     };
 
