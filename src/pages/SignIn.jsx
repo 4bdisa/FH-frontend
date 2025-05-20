@@ -18,9 +18,11 @@ const SignIn = () => {
 
     try {
       const { token, user } = await loginUser({
+        
         email: formData.email,
         password: formData.password,
       });
+      
 
       // Save token and user details in local storage
       localStorage.setItem("authToken", token);

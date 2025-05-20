@@ -1,9 +1,10 @@
-import API from "../config/apiConfig";
+import API from "../services/api";
 
 // auth.js
 
 export const loginUser = async (credentials) => {
   try {
+    
     const response = await API.post(`/api/login`, credentials, {
       withCredentials: true // For cookies if using them
     });
