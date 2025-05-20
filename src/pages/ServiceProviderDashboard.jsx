@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import API from "../services/api";
+//import ViewProfile from "../components/ViewProfile"; // Remove ViewProfile import
+//import UpdateProfile from "../components/UpdateProfile"; // Remove this import
 
 const ServiceProviderDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
@@ -92,9 +94,10 @@ const ServiceProviderDashboard = () => {
                                 Dashboard
                             </Link>
                         </li>
-                        <li>
+                        {/* Remove the Update Profile link from the sidebar */}
+                        {/*<li>
                             <Link
-                                to="/service-provider-dashboard/profile-update"
+                                to="/service-provider-dashboard/update-profile"
                                 className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
                             >
                                 <svg
@@ -112,6 +115,28 @@ const ServiceProviderDashboard = () => {
                                     ></path>
                                 </svg>
                                 Update Profile
+                            </Link>
+                        </li>*/}
+                        <li>
+                            <Link
+                                to="/service-provider-dashboard/view-profile"
+                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
+                            >
+                                <svg
+                                    className="w-5 h-5 mr-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M5 13l4 4L19 7"
+                                    ></path>
+                                </svg>
+                                View Profile
                             </Link>
                         </li>
                         <li>
@@ -208,10 +233,10 @@ const ServiceProviderDashboard = () => {
                                 {/* Actions */}
                                 <div className="border-t border-gray-200">
                                     <Link
-                                        to="/service-provider-dashboard/profile-update"
+                                        to="/service-provider-dashboard/view-profile"
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                                     >
-                                        Edit Profile
+                                        View Profile
                                     </Link>
                                     <button
                                         onClick={handleSignOut}

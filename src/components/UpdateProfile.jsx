@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 const UpdateProfile = () => {
     const [formData, setFormData] = useState({
@@ -8,6 +10,7 @@ const UpdateProfile = () => {
         workDays: "",
         experienceYears: "",
         homeService: false,
+        phoneNumber: "",
     });
 
     const handleChange = (e) => {
@@ -15,6 +18,13 @@ const UpdateProfile = () => {
         setFormData({
             ...formData,
             [name]: type === "checkbox" ? checked : value,
+        });
+    };
+
+    const handlePhoneNumberChange = (value) => {
+        setFormData({
+            ...formData,
+            phoneNumber: value,
         });
     };
 
@@ -130,6 +140,18 @@ const UpdateProfile = () => {
                         className="mr-2"
                     />
                     <span>Available for home service</span>
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Phone Number
+                    </label>
+                    <PhoneInput
+                        placeholder="Enter phone number"
+                        value={formData.phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        defaultCountry="US"
+                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                 </div>
                 <button
                     type="submit"

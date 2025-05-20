@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./pages/SignIn";
@@ -9,7 +10,8 @@ import ServiceProviderForm from "./pages/auth/ServiceProviderForm";
 import ClientRegistrationForm from "./pages/auth/client";
 import Home from "./pages/home";
 import { JobPostFlow } from "./pages/Jobs/PostJob";
-import UpdateProfile from "./pages/Profile/UpdateProfile";
+import UpdateProfile from "./components/UpdateProfile";
+import ViewProfile from "./components/ViewProfile";
 import LearnMore from "./pages/LearnMore";
 import ServiceProviderDashboard from "./pages/ServiceProviderDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -23,7 +25,7 @@ import ChangeStateAndReview from "./pages/Jobs/ChangeStateAndReview";
 import ProviderJobHistory from "./pages/Jobs/ProviderJobHistory";
 
 const App = () => (
-  <BrowserRouter>
+  <Router>
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
@@ -58,9 +60,14 @@ const App = () => (
       <Route element={<ProtectedRoute allowedRoles={["service_provider", "client"]} />}>
         <Route path="/dashboard/profile/update" element={<UpdateProfile />} />
       </Route>
+      <Route path="/service-provider-dashboard/*" element={<ServiceProviderDashboard />}>
+        <Route path="update-profile" element={<UpdateProfile />} />
+        <Route path="view-profile" element={<ViewProfile />} />
+        {/* ... other nested routes */}
+      </Route>
     </Routes>
     <ToastContainer position="top-right" autoClose={3000} />
-  </BrowserRouter>
+  </Router>
 );
 
 export default App;

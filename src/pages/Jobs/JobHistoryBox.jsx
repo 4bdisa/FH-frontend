@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import API from "../../services/api.js"; // Adjust the import path as necessary
 
 const JobHistoryBox = ({
     request,
@@ -6,7 +7,55 @@ const JobHistoryBox = ({
     handleContactClick,
     navigate
 }) => {
-    
+
+    const [reportModalOpen, setReportModalOpen] = useState(false);
+    const [reportType, setReportType] = useState('');
+    const [reportComment, setReportComment] = useState('');
+
+    const handleReportClick = (e) => {
+        e.stopPropagation();
+        setReportModalOpen(true); // Open the report modal
+    };
+
+    const handleReportSubmit = async () => {
+        try {
+            const reporterId = localStorage.getItem('userId'); // Or however you store the user ID
+            if (!reporterId) {
+                console.error('User ID not found.  User must be logged in.');
+                // Optionally show an error message to the user
+                return;
+            }
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports`, { //  URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    requestId: request._id,
+                    reportType: reportType,
+                    comment: reportComment,
+                    reporterId: reporterId  // Add the reporterId
+                })
+            });
+
+            if (!response.ok) {
+                // Handle error responses (e.g., show an error message)
+                console.error('Report submission failed:', response.statusText);
+                return;
+            }
+
+            // Handle successful report submission (e.g., show a success message)
+            console.log('Report submitted successfully');
+            setReportModalOpen(false); // Close the modal
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            // Handle network errors or other exceptions
+        }
+    };
+
+    // ... (rest of your component)
 
     return (
         <li
@@ -30,6 +79,7 @@ const JobHistoryBox = ({
                     className="h-5 w-5"
                 />
             </button>
+
             {/* Request Details */}
             <div className="w-full">
                 <h2 className="text-lg font-semibold text-blue-700">{request.category}</h2>
@@ -65,8 +115,6 @@ const JobHistoryBox = ({
                     <span className="text-gray-700 text-sm">{request.providerId.name}</span>
                 </div>
             )}
-
-        
 
             {/* Rating and Review for Completed Requests */}
             {request.status === "completed" && request.reviewId && (
@@ -122,6 +170,63 @@ const JobHistoryBox = ({
                     >
                         Change State and Review
                     </button>
+                </div>
+            )}
+            {/* Report Button */}
+            <div className="mt-4 w-full">
+                <button
+                    onClick={handleReportClick}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
+                    title="Report Request"
+                >
+                    Report
+                </button>
+            </div>
+            {/* Report Modal */}
+            {reportModalOpen && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-white p-8 rounded-lg">
+                        <h2 className="text-lg font-semibold mb-4">Report Request</h2>
+                        <div className="mb-4">
+                            <label htmlFor="reportType" className="block text-gray-700 text-sm font-bold mb-2">Report Type:</label>
+                            <select
+                                id="reportType"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={reportType}
+                                onChange={(e) => setReportType(e.target.value)}
+                            >
+                                <option value="">Select a reason</option>
+                                <option value="scam">Scam</option>
+                                <option value="harassment">Harassment</option>
+                                <option value="inappropriate">Inappropriate Content</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="reportComment" className="block text-gray-700 text-sm font-bold mb-2">Comment:</label>
+                            <textarea
+                                id="reportComment"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={reportComment}
+                                onChange={(e) => setReportComment(e.target.value)}
+                                rows="3"
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                                onClick={() => setReportModalOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                onClick={handleReportSubmit}
+                            >
+                                Submit Report
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </li>
