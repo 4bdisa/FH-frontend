@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API from "../services/api";
@@ -13,6 +13,9 @@ const CustomerDashboard = () => {
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [fhCoins, setFhCoins] = useState(0); // State to store fh-coin balance
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [depositAmount, setDepositAmount] = useState("");
+    const dropdownRef = useRef(null);
 
     // Fetch fh-coin balance from the database
     useEffect(() => {
@@ -43,24 +46,49 @@ const CustomerDashboard = () => {
         fetchFhCoins();
     }, []);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [dropdownRef]);
+
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         navigate("/pages/SignIn");
     };
 
-    const handleDeposit = async () => {
-        const totalAmount = prompt("Enter the amount to deposit (in ETB):");
+    const openDepositModal = () => {
+        setIsDepositModalOpen(true);
+    };
 
-        if (!totalAmount || isNaN(totalAmount) || totalAmount <= 0) {
+    const closeDepositModal = () => {
+        setIsDepositModalOpen(false);
+        setDepositAmount(""); // Clear the input field when closing
+    };
+
+    const handleInputChange = (e) => {
+        setDepositAmount(e.target.value);
+    };
+
+    const handleDeposit = async () => {
+        if (!depositAmount || isNaN(depositAmount) || parseFloat(depositAmount) <= 0) {
             alert("Please enter a valid amount.");
             return;
         }
 
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/transactions/create`,
-                { totalAmount },
+            const response = await API.post(
+                `/api/transactions/create`,
+                { totalAmount: parseFloat(depositAmount) },
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -77,6 +105,8 @@ const CustomerDashboard = () => {
         } catch (error) {
             console.error("Error initializing payment:", error);
             alert("An error occurred. Please try again.");
+        } finally {
+            closeDepositModal(); // Close the modal after the deposit attempt
         }
     };
 
@@ -213,6 +243,7 @@ const CustomerDashboard = () => {
                         {isDropdownOpen && (
                             <div
                                 className="absolute right-4 mt-14 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+                                ref={dropdownRef}
                             >
                                 {/* User Info */}
                                 <div className="p-4 flex items-center">
@@ -235,7 +266,7 @@ const CustomerDashboard = () => {
                                         FH-Coin Balance: <span className="text-blue-600">{fhCoins}</span>
                                     </p>
                                     <button
-                                        onClick={handleDeposit}
+                                        onClick={openDepositModal}
                                         className="mt-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
                                     >
                                         Deposit
@@ -261,6 +292,42 @@ const CustomerDashboard = () => {
                         )}
                     </div>
                 </header>
+
+                {/* Deposit Modal */}
+                {isDepositModalOpen && (
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                        <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                            <div className="mt-3 text-center">
+                                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                                    Deposit FH-Coins
+                                </h3>
+                                <div className="mt-2 px-7 py-3">
+                                    <input
+                                        type="number"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        placeholder="Enter amount in ETB"
+                                        value={depositAmount}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                                <div className="items-center px-4 py-3">
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+                                        onClick={handleDeposit}
+                                    >
+                                        Deposit Now
+                                    </button>
+                                    <button
+                                        className="mt-2 px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        onClick={closeDepositModal}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Dynamic Content */}
                 <main className="flex-1 p-6">

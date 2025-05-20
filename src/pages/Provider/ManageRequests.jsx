@@ -7,6 +7,7 @@ const ManageRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    // eslint-disable-next-line no-unused-vars
     const [mediaUrls, setMediaUrls] = useState({}); // Store media URLs by request ID
 
     // Cloudinary configuration

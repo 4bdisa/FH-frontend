@@ -180,6 +180,7 @@ export function JobPostFlow() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      // eslint-disable-next-line no-unused-vars
       const data = await response.json();
 
       setStep(3); // Move to the confirmation step
