@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tailwindcss -i ./src/input.css -o ./src/output.css --watch",
-    "build": "vite build --outDir dist",
+    "build": "tailwindcss -i ./src/input.css -o ./src/output.css --minify && vite build --outDir dist",
     "start": "vite"
   },
   "dependencies": {
