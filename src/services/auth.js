@@ -8,6 +8,7 @@ export const loginUser = async (credentials) => {
     const response = await API.post(`/api/login`, credentials, {
       withCredentials: true // For cookies if using them
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

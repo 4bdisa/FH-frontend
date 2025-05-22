@@ -17,7 +17,9 @@ const JobHistory = () => {
         const fetchJobHistory = async () => {
             try {
                 const response = await API.get("/api/v1/requests/history");
-                setRequests(response.data.data);
+                // Sort requests by createdAt in descending order (newest first)
+                const sortedRequests = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setRequests(sortedRequests);
             } catch (err) {
                 console.error("Error fetching job history:", err);
                 setError("Failed to fetch job history. Please try again.");
@@ -131,6 +133,7 @@ const JobHistory = () => {
                             openModal={openModal}
                             handleContactClick={handleContactClick}
                             navigate={navigate}
+                            hideReportButton={request.status === "completed"} // Add this prop
                         />
                     ))}
                 </ul>

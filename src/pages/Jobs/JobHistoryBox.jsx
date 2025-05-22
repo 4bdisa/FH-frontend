@@ -1,61 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import API from "../../services/api.js"; // Adjust the import path as necessary
 
 const JobHistoryBox = ({
     request,
     openModal,
     handleContactClick,
-    navigate
+    navigate,
+    hideReportButton
 }) => {
-
     const [reportModalOpen, setReportModalOpen] = useState(false);
     const [reportType, setReportType] = useState('');
     const [reportComment, setReportComment] = useState('');
+    const [reportSubmitted, setReportSubmitted] = useState(false);
+
+    // Check if this request has already been reported by this user
+    useEffect(() => {
+        const checkReported = async () => {
+            const reporterId = localStorage.getItem('userId');
+            if (!reporterId) return;
+            try {
+                const res = await API.post('/api/reports/check', {
+                    requestId: request._id,
+                    reporterId
+                });
+                if (res.data && res.data.reported) setReportSubmitted(true);
+            } catch (err) {
+                // Optionally handle error
+            }
+        };
+        checkReported();
+    }, [request._id]);
 
     const handleReportClick = (e) => {
         e.stopPropagation();
-        setReportModalOpen(true); // Open the report modal
+        setReportModalOpen(true);
     };
 
     const handleReportSubmit = async () => {
         try {
-            const reporterId = localStorage.getItem('userId'); // Or however you store the user ID
-            if (!reporterId) {
-                console.error('User ID not found.  User must be logged in.');
-                // Optionally show an error message to the user
-                return;
-            }
-
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports`, { //  URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    requestId: request._id,
-                    reportType: reportType,
-                    comment: reportComment,
-                    reporterId: reporterId  // Add the reporterId
-                })
+            const reporterId = localStorage.getItem('userId');
+            if (!reporterId) return;
+            const response = await API.post("/api/reports", {
+                requestId: request._id,
+                reportType,
+                comment: reportComment,
+                reporterId
             });
-
-            if (!response.ok) {
-                // Handle error responses (e.g., show an error message)
-                console.error('Report submission failed:', response.statusText);
-                return;
+            if (response.status === 201 || response.status === 200) {
+                setReportModalOpen(false);
+                setReportSubmitted(true);
             }
-
-            // Handle successful report submission (e.g., show a success message)
-            console.log('Report submitted successfully');
-            setReportModalOpen(false); // Close the modal
         } catch (error) {
-            console.error('Error submitting report:', error);
-            // Handle network errors or other exceptions
+            // Optionally handle error
         }
     };
 
-    // ... (rest of your component)
+
 
     return (
         <li
@@ -174,13 +175,10 @@ const JobHistoryBox = ({
             )}
             {/* Report Button */}
             <div className="mt-4 w-full">
-                <button
-                    onClick={handleReportClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
-                    title="Report Request"
-                >
-                    Report
-                </button>
+                {!hideReportButton && request.status !== "completed" && !reportSubmitted && (
+                    <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500" onClick={handleReportClick}>Report</button>
+                )}
+                {reportSubmitted && <p className="text-green-600">You reported successfully</p>}
             </div>
             {/* Report Modal */}
             {reportModalOpen && (

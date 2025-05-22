@@ -18,11 +18,9 @@ const SignIn = () => {
 
     try {
       const { token, user } = await loginUser({
-        
         email: formData.email,
         password: formData.password,
       });
-      
 
       // Save token and user details in local storage
       localStorage.setItem("authToken", token);
@@ -43,8 +41,31 @@ const SignIn = () => {
       } else if (user.role === "client") {
         navigate("/customer-dashboard");
       }
-    } catch (error) {
-      setError(error.message || "Login failed. Please check your credentials.");
+    } catch (err) {
+      // Check if the error is an AxiosError and has a response
+      if (err.response) {
+        const { status, data } = err.response;
+
+        // Handle specific error messages based on the backend response
+        if (status === 403 && data.error === "Your account is banned. Please contact the administrator.") {
+          setError("Your account is banned. Please contact the administration.");
+        } else if (status === 401 && data.error === "Invalid email or password") {
+          setError("Invalid email or password. Please check your credentials.");
+        } else if (status === 500 && data.error === "Authentication failed") {
+          setError("Authentication failed. Please try again later.");
+        }
+        else {
+          // Generic error message for other errors
+          setError("Login failed. Please check your credentials.");
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError("Network error. Please check your internet connection.");
+      }
+       else {
+        // Something happened in setting up the request that triggered an Error
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

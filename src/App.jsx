@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./pages/SignIn";
@@ -23,9 +23,13 @@ import JobHistory from "./pages/Jobs/JobHistory";
 import AcceptedJobs from "./pages/Jobs/acceptedJobs";
 import ChangeStateAndReview from "./pages/Jobs/ChangeStateAndReview";
 import ProviderJobHistory from "./pages/Jobs/ProviderJobHistory";
+import AdminLoginPage from '../src/pages/admin/AdminLoginPage';
+import AdminCreatePage from '../src/pages/admin/AdminCreatePage';
+import AdminDashboardPage from '../src/pages/admin/AdminDashboardPage';
+import ContactAdminPage from "../src/components/contactAdminpage"; // Import the ContactAdminPage component
 
 const App = () => (
-  <Router>
+  <BrowserRouter>
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
@@ -35,6 +39,10 @@ const App = () => (
       <Route path="/complete-client" element={<ClientRegistrationForm />} />
       <Route path="/oauth/callback" element={<OAuthRedirect />} />
       <Route path="/learn-more" element={<LearnMore />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/create" element={<AdminCreatePage />} />
+      <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+      <Route path="/contact-admin" element={<ContactAdminPage />} /> {/* Add the route for ContactAdminPage */}
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["service_provider"]} />}>
@@ -67,7 +75,7 @@ const App = () => (
       </Route>
     </Routes>
     <ToastContainer position="top-right" autoClose={3000} />
-  </Router>
+  </BrowserRouter>
 );
 
 export default App;

@@ -16,7 +16,13 @@ const Home = () => {
             />
             <h1 className="ml-3 text-2xl font-bold text-blue-600">FixerHub</h1>
           </div>
-          <div>
+          <div className="flex gap-4 items-center">
+            <Link
+              to="/contact-admin"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+            >
+              Contact Admin
+            </Link>
             <Link
               to="/pages/SignIn"
               className="text-sm font-semibold text-blue-600 hover:text-blue-800"
