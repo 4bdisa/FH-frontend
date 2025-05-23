@@ -16,6 +16,7 @@ const CustomerDashboard = () => {
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [depositAmount, setDepositAmount] = useState("");
     const dropdownRef = useRef(null);
+    const [transactionStatus, setTransactionStatus] = useState(null); // State to store transaction status
 
     // Fetch fh-coin balance from the database
     useEffect(() => {
@@ -98,6 +99,14 @@ const CustomerDashboard = () => {
 
             if (response.data.success) {
                 // Redirect to Chapa checkout page
+                localStorage.setItem(`transactionStatus_${response.data.txRef}`, 'pending'); // Store initial status
+                localStorage.setItem('txRef', response.data.txRef); // Store txRef
+
+                // Attempt to detect window close (unreliable)
+                window.addEventListener('beforeunload', () => {
+                    localStorage.setItem('paymentCancelled', 'true');
+                });
+
                 window.location.href = response.data.checkoutUrl;
             } else {
                 alert("Failed to initialize payment. Please try again.");
@@ -108,6 +117,25 @@ const CustomerDashboard = () => {
         } finally {
             closeDepositModal(); // Close the modal after the deposit attempt
         }
+    };
+
+    // Check transaction status on component mount
+    useEffect(() => {
+        const checkTransactionStatus = async () => {
+            const txRef = localStorage.getItem('txRef');
+            if (txRef) {
+                const status = localStorage.getItem(`transactionStatus_${txRef}`);
+                setTransactionStatus(status); // Set transaction status in state
+                localStorage.removeItem(`transactionStatus_${txRef}`); // Clear status
+            }
+        };
+
+        checkTransactionStatus();
+    }, []);
+
+    const handleGoToDashboard = () => {
+        localStorage.removeItem('txRef'); // Clear txRef
+        navigate("/customer-dashboard"); // Redirect
     };
 
     return (
@@ -295,7 +323,7 @@ const CustomerDashboard = () => {
 
                 {/* Deposit Modal */}
                 {isDepositModalOpen && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"> {/* Added z-50 */}
                         <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                             <div className="mt-3 text-center">
                                 <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -331,6 +359,25 @@ const CustomerDashboard = () => {
 
                 {/* Dynamic Content */}
                 <main className="flex-1 p-6">
+                    {/* Transaction Status Display */}
+                    {transactionStatus === 'success' && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                            <strong className="font-bold">Payment Successful!</strong>
+                            <span className="block sm:inline"> Your FH-Coin deposit was successful.</span>
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={handleGoToDashboard}
+                            >
+                                Go to Dashboard
+                            </button>
+                        </div>
+                    )}
+                    {transactionStatus === 'failed' && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong className="font-bold">Payment Failed!</strong>
+                            <span className="block sm:inline"> There was an error processing your payment. Please try again.</span>
+                        </div>
+                    )}
                     <Outlet />
                 </main>
             </div>
