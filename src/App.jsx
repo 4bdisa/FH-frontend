@@ -16,7 +16,6 @@ import LearnMore from "./pages/LearnMore";
 import ServiceProviderDashboard from "./pages/ServiceProviderDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import ServiceProviderProfileUpdate from "./pages/Profile/ServiceProviderProfileUpdate";
-import CustomerProfileUpdate from "./pages/Profile/CustomerProfileUpdate";
 import ManageRequests from "./pages/Provider/ManageRequests";
 import BrowseServices from "./pages/BrowseServices";
 import JobHistory from "./pages/Jobs/JobHistory";
@@ -27,6 +26,7 @@ import AdminLoginPage from '../src/pages/admin/AdminLoginPage';
 import AdminCreatePage from '../src/pages/admin/AdminCreatePage';
 import AdminDashboardPage from '../src/pages/admin/AdminDashboardPage';
 import ContactAdminPage from "../src/components/contactAdminpage"; // Import the ContactAdminPage component
+import CustomerProfile from "./pages/Profile/CustomerProfile";
 
 const App = () => (
   <BrowserRouter>
@@ -57,7 +57,7 @@ const App = () => (
       <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
         <Route path="/customer-dashboard" element={<CustomerDashboard />}>
           <Route index element={<BrowseServices />} />
-          <Route path="profile-update" element={<CustomerProfileUpdate />} />
+          <Route path="profile-update" element={<CustomerProfile />} /> {/* Corrected Route */}
           <Route path="job-history" element={<JobHistory />} />
           <Route path="post-job" element={<JobPostFlow />} />
           <Route path="/customer-dashboard/job-history/:requestId/review" element={<ChangeStateAndReview />} />

@@ -176,7 +176,7 @@ const CustomerDashboard = () => {
                         </li>
                         <li>
                             <Link
-                                to="/customer-dashboard/profile-update"
+                                to="/customer-dashboard/profile-update" // Corrected Route
                                 className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
                             >
                                 <svg

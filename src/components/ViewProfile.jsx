@@ -84,16 +84,27 @@ const ViewProfile = () => {
                         <UpdateProfile onCancel={handleCancelEdit} /> // Render UpdateProfile when in edit mode
                     ) : (
                         <>
-                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">About Me</h2>
+                            {/* <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">About Me</h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-6">
                                 {profile.bio || "No bio available."}
-                            </p>
-                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Skills</h2>
-                            <div className="flex flex-wrap gap-2 mb-6">
+                            </p> */}
+                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Category</h2>
+                             <div className="flex flex-wrap gap-2 mb-6">
                                 {profile.skills && profile.skills.map((skill, index) => (
                                     <span key={index} className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">{skill}</span>
                                 ))}
                             </div>
+
+                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Keywords</h2>
+                            <p className="text-gray-700 dark:text-gray-300 mb-6">
+                                {profile.keywords || "Not specified"}
+                            </p>
+
+                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Country</h2>
+                            <p className="text-gray-700 dark:text-gray-300 mb-6">
+                                {profile.country || "Not specified"}
+                            </p>
+
                             <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Service Information</h2>
                             <ul className="space-y-2 text-gray-700 dark:text-gray-300 mb-6">
                                 {profile.homeService !== undefined && (
@@ -106,7 +117,11 @@ const ViewProfile = () => {
                                         Work Days: {profile.workDays.join(', ')}
                                     </li>
                                 )}
-                            
+                                {profile.yearsOfExperience && (
+                                    <li className="flex items-center">
+                                        Years of Experience: {profile.yearsOfExperience}
+                                    </li>
+                                )}
                             </ul>
                             <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Contact Information</h2>
                             <ul className="space-y-2 text-gray-700 dark:text-gray-300">

@@ -72,13 +72,13 @@ const UpdateProfile = () => {
                     Update Profile
                 </h2>
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Skills</label>
+                    <label className="block text-gray-700 font-medium mb-2">Category</label>
                     <input
                         type="text"
                         name="skills"
                         value={formData.skills}
                         onChange={handleChange}
-                        placeholder="e.g., Plumbing, Electrical"
+                        placeholder="e.g., Tv, Pc, Fridge, etc."
                         className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
@@ -100,7 +100,7 @@ const UpdateProfile = () => {
                         name="country"
                         value={formData.country}
                         onChange={handleChange}
-                        placeholder="e.g., USA"
+                        placeholder="e.g., Harer, dire dawa, etc."
                         className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>

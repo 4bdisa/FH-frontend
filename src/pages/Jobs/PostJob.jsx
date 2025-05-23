@@ -193,7 +193,7 @@ export function JobPostFlow() {
   };
 
   const sortedProviders = [...providers].sort((a, b) => {
-    if (sort === "rating") return b.rating - a.rating;
+    if (sort === "averageRating") return b.averageRating - a.averageRating;
     if (sort === "price") return a.hourlyRate - b.hourlyRate;
     if (sort === "experience") return b.experience - a.experience; // Sort by experience
     if (sort === "completedJobs") return b.completedJobs - a.completedJobs; // Sort by completed jobs
@@ -326,10 +326,10 @@ export function JobPostFlow() {
           </h3>
           <div className="flex justify-center gap-4 mb-6">
             <button
-              onClick={() => setSort("rating")}
+              onClick={() => setSort("averageRating")}
               className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
             >
-              Sort by Rating
+              Sort by averageRating
             </button>
             <button
               onClick={() => setSort("price")}
@@ -355,7 +355,7 @@ export function JobPostFlow() {
                   <h4 className="text-lg font-semibold text-blue-700">
                     {provider.email}
                   </h4>
-                  <p className="text-sm text-gray-700">Rating: {provider.rating}</p>
+                  
                   <p className="text-sm text-gray-700">
                     Hourly Rate: ${provider.hourlyRate}
                   </p>
@@ -365,6 +365,12 @@ export function JobPostFlow() {
                   <p className="text-sm text-gray-700">
                     Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} km
                   </p> {/* Display distance in kilometers */}
+                  {/* Display Average Rating */}
+                  {provider.averageRating !== undefined && (
+                    <p className="text-sm text-gray-700">
+                      Average Rating: {provider.averageRating.toFixed(2)}
+                    </p>
+                  )}
                   <button
                     onClick={() => handleProviderSelect(provider._id)}
                     className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition"
