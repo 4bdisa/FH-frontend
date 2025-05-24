@@ -91,7 +91,7 @@ export function JobPostFlow() {
 
       // Update the media state with validUrls
       setMedia(validUrls);
-      
+
     } catch (error) {
       console.error("Media upload error:", error);
       alert("Failed to upload all media. Please try again.");
@@ -119,7 +119,7 @@ export function JobPostFlow() {
           const { latitude, longitude } = position.coords;
           setCoordinates({ latitude, longitude });
           setLoading(true);
-          
+
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/search-providers`, {
             method: "POST",
             headers: {
@@ -157,7 +157,7 @@ export function JobPostFlow() {
   const handleProviderSelect = async (providerId) => {
     try {
       setLoading(true);
-      
+
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/select-provider`, {
         method: "POST",
@@ -200,6 +200,12 @@ export function JobPostFlow() {
     if (sort === "distance") return a.distance - b.distance;
     return 0;
   });
+
+  const renderStarRating = (rating) => {
+    const filledStars = '⭐'.repeat(Math.floor(rating));
+    const emptyStars = '☆'.repeat(5 - Math.floor(rating));
+    return filledStars + emptyStars;
+  };
 
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6">
@@ -355,20 +361,88 @@ export function JobPostFlow() {
                   <h4 className="text-lg font-semibold text-blue-700">
                     {provider.email}
                   </h4>
-                  
+
                   <p className="text-sm text-gray-700">
                     Hourly Rate: ${provider.hourlyRate}
                   </p>
                   <p className="text-sm text-gray-700">
                     Completed Jobs: {provider.completedJobs}
-                  </p>
+                  </p>```javascript
+                  // Add a new state to store the selected provider
+                  const [selectedProvider, setSelectedProvider] = useState(null);
+
+// ...
+
+// Update the handleProviderSelect function to update the selectedProvider state
+const handleProviderSelect = async (providerId) => {
+  try {
+                    setLoading(true);
+
+                  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/select-provider`, {
+                    method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+                  body: JSON.stringify({
+                    providerId,
+                    description: jobDetails.description,
+                  category: jobDetails.category,
+                  location: {type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] },
+                  budget: jobDetails.budget,
+                  isFixedPrice: jobDetails.isFixedPrice,
+                  media: media, // Include media URLs in the request
+      }),
+    });
+
+                  if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+                  const data = await response.json();
+                  setSelectedProvider(data.provider); // Update the selectedProvider state
+                  setStep(3); // Move to the confirmation step
+  } catch (error) {
+                    console.error("Error creating service request:", error);
+                  alert("Failed to create service request. Please try again.");
+  } finally {
+                    setLoading(false);
+  }
+};
+
+                  // ...
+
+                  // Update the step 3 component to display the selected provider's information
+                  {step === 3 && (
+                    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md text-center">
+                      <h3 className="text-2xl font-semibold text-blue-600 mb-4">
+                        Service Request Created Successfully!
+                      </h3>
+                      <p className="text-gray-700">
+                        Your service request has been sent to {selectedProvider && selectedProvider.email}. They will contact you soon.
+                      </p>
+                      <p className="text-gray-700">
+                        Provider Details:
+                      </p>
+                      <p className="text-gray-700">
+                        Email: {selectedProvider && selectedProvider.email}
+                      </p>
+                      <p className="text-gray-700">
+                        Hourly Rate: ${selectedProvider && selectedProvider.hourlyRate}
+                      </p>
+                      <p className="text-gray-700">
+                        Completed Jobs: {selectedProvider && selectedProvider.completedJobs}
+                      </p>
+                    </div>
+                  )}
+                  ```
                   <p className="text-sm text-gray-700">
                     Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} km
                   </p> {/* Display distance in kilometers */}
                   {/* Display Average Rating */}
                   {provider.averageRating !== undefined && (
                     <p className="text-sm text-gray-700">
-                      Average Rating: {provider.averageRating.toFixed(2)}
+                      Average Rating: {renderStarRating(provider.averageRating)}
                     </p>
                   )}
                   <button

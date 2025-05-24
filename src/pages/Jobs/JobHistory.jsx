@@ -61,7 +61,7 @@ const JobHistory = () => {
                 alert("Insufficient FH-Coins. Please top up your balance.");
                 return;
             }
-
+            
             // Process payment
             const paymentResponse = await API.patch(`/api/v1/requests/${selectedRequest._id}/pay`);
 
