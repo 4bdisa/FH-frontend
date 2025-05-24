@@ -36,15 +36,15 @@ const ManageRequests = () => {
                     // Generate Cloudinary URLs for each request
                     const urls = {};
                     response.data.data.forEach(request => {
-                        
+
 
                         if (request.media && request.media.length > 0) {
                             urls[request._id] = request.media.map(publicId => cl.url(publicId));
                         }
-                        
+
                     });
                     setMediaUrls(urls);
-                    
+
                 }
             } catch (err) {
                 if (err.response && err.response.status === 404 && err.response.data.message === "No requests found for this provider") {
@@ -88,6 +88,10 @@ const ManageRequests = () => {
         }
     };
 
+    const openMediaInNewTab = (url) => {
+        window.open(url, '_blank');
+    };
+
     if (loading) {
         return <div className="text-center">Loading requests...</div>;
     }
@@ -117,9 +121,21 @@ const ManageRequests = () => {
                             {request.media && request.media.length > 0 && (
                                 <div className="mb-2 flex flex-wrap">
                                     {request.media.map((url, index) => (
-                                        <div key={index} className="w-24 h-24 m-1 relative">
-                                            {url.match(/.(jpeg|jpg|gif|png)$/) ? (
-                                                <img src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" />
+                                        <div key={index} className="w-24 h-24 m-1 relative flex items-center">
+                                            {url.match(/.(jpeg|jpg|gif|png|webp|bmp|tiff|tif|heic|heif|svg|ico|raw|jfif|avif)$/) ? (
+                                                <>
+                                                    <img
+                                                        src={url}
+                                                        alt={`Uploaded media ${index}`}
+                                                        className="w-full h-full object-cover rounded-md"
+                                                    />
+                                                    <button
+                                                        onClick={() => openMediaInNewTab(url)}
+                                                        className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 text-xs"
+                                                    >
+                                                        View File
+                                                    </button>
+                                                </>
                                             ) : (
                                                 <video src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" controls />
                                             )}

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ReportsView from '../../components/admin/ReportsView';
-import UserManagement from '../../components/admin/UserManagement'; // <-- Import the component
+import UserManagement from '../../components/admin/UserManagement';
+import CreateAdmin from '../../components/admin/CreateAdmin'; // Import CreateAdmin component
 
 const AdminDashboardPage = () => {
     const [admin, setAdmin] = useState(null);
     const [error, setError] = useState('');
     const [activeView, setActiveView] = useState('dashboard');
     const [reports, setReports] = useState([]);
-    const [reportCount, setReportCount] = useState(0); // State to store the number of reports
-    const [newReportCount, setNewReportCount] = useState(0); // State to store the number of new reports
+    const [reportCount, setReportCount] = useState(0);
+    const [newReportCount, setNewReportCount] = useState(0);
 
     useEffect(() => {
         const fetchAdminData = async () => {
@@ -57,8 +58,8 @@ const AdminDashboardPage = () => {
 
                 const data = await response.json();
                 setReports(data);
-                setReportCount(data.length); // Set the report count
-                setNewReportCount(data.length); // Initially, all reports are new
+                setReportCount(data.length);
+                setNewReportCount(data.length);
             } catch (error) {
                 setError('Failed to load reports.');
             }
@@ -91,10 +92,9 @@ const AdminDashboardPage = () => {
                 throw new Error('Failed to delete report');
             }
 
-            // Update the reports state after successful deletion
             setReports(reports.filter(report => report._id !== reportId));
-            setReportCount(prevCount => prevCount - 1); // Decrement the report count
-            setNewReportCount(prevCount => prevCount > 0 ? prevCount - 1 : 0); // Decrement new report count
+            setReportCount(prevCount => prevCount - 1);
+            setNewReportCount(prevCount => prevCount > 0 ? prevCount - 1 : 0);
         } catch (error) {
             setError('Failed to delete report.');
         }
@@ -102,7 +102,11 @@ const AdminDashboardPage = () => {
 
     const handleViewReports = () => {
         setActiveView('reports');
-        setNewReportCount(0); // Reset new report count when viewing reports
+        setNewReportCount(0);
+    };
+
+    const handleAddAdmin = () => {
+        setActiveView('createAdmin'); // Set active view to 'createAdmin'
     };
 
     if (error) {
@@ -134,7 +138,9 @@ const AdminDashboardPage = () => {
             case 'reports':
                 return <ReportsView reports={reports} onDeleteReport={handleDeleteReport} />;
             case 'users':
-                return <UserManagement />; // <-- Show user management component
+                return <UserManagement />;
+            case 'createAdmin':
+                return <CreateAdmin />; // Render CreateAdmin component
             default:
                 return (
                     <div className="bg-white rounded-lg shadow-md p-6">
@@ -183,6 +189,12 @@ const AdminDashboardPage = () => {
                                 onClick={() => setActiveView('users')}
                             >
                                 <span className="text-gray-700">User Management</span>
+                            </li>
+                            <li
+                                className={`py-2 px-4 hover:bg-gray-300 cursor-pointer rounded-md transition duration-300 ease-in-out ${activeView === 'createAdmin' ? 'bg-gray-300' : ''}`}
+                                onClick={handleAddAdmin}
+                            >
+                                <span className="text-gray-700">Add Another Admin</span>
                             </li>
                         </ul>
                     </nav>

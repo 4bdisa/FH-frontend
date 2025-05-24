@@ -23,7 +23,7 @@ import AcceptedJobs from "./pages/Jobs/acceptedJobs";
 import ChangeStateAndReview from "./pages/Jobs/ChangeStateAndReview";
 import ProviderJobHistory from "./pages/Jobs/ProviderJobHistory";
 import AdminLoginPage from '../src/pages/admin/AdminLoginPage';
-import AdminCreatePage from '../src/pages/admin/AdminCreatePage';
+
 import AdminDashboardPage from '../src/pages/admin/AdminDashboardPage';
 import ContactAdminPage from "../src/components/contactAdminpage"; // Import the ContactAdminPage component
 import CustomerProfile from "./pages/Profile/CustomerProfile";
@@ -40,7 +40,6 @@ const App = () => (
       <Route path="/oauth/callback" element={<OAuthRedirect />} />
       <Route path="/learn-more" element={<LearnMore />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
-      <Route path="/admin/create" element={<AdminCreatePage />} />
       <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
       <Route path="/contact-admin" element={<ContactAdminPage />} /> {/* Add the route for ContactAdminPage */}
 

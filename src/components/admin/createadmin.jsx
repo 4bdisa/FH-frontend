@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import API from '../../services/api.js'
 
-const AdminCreatePage = () => {
+const CreateAdmin = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -122,4 +121,4 @@ const AdminCreatePage = () => {
     );
 };
 
-export default AdminCreatePage;
+export default CreateAdmin;

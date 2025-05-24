@@ -12,6 +12,8 @@ const JobHistory = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isPaying, setIsPaying] = useState(false);
     const navigate = useNavigate();
+    const [depositAmount, setDepositAmount] = useState("");
+    const [showDepositModal, setShowDepositModal] = useState(false);
 
     useEffect(() => {
         const fetchJobHistory = async () => {
@@ -57,8 +59,9 @@ const JobHistory = () => {
 
             // First check customer balance
             const balanceResponse = await API.get("/api/user/fh-coins");
-            if (balanceResponse.data.balance < 5) {
-                alert("Insufficient FH-Coins. Please top up your balance.");
+            console.log("Balance Response:", balanceResponse.data.fhCoins);
+            if (balanceResponse.data.fhCoins < 5) {
+                setShowDepositModal(true);
                 return;
             }
             
@@ -109,6 +112,50 @@ const JobHistory = () => {
     const closeContactModal = () => {
         setShowContactModal(false);
         setSelectedRequest(null);
+    };
+
+    const closeDepositModal = () => {
+        setShowDepositModal(false);
+        setDepositAmount("");
+    };
+
+    const handleDeposit = async () => {
+        if (!depositAmount || isNaN(depositAmount) || parseFloat(depositAmount) <= 0) {
+            alert("Please enter a valid amount.");
+            return;
+        }
+
+        try {
+            const response = await API.post(
+                `/api/transactions/create`,
+                { totalAmount: parseFloat(depositAmount) },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                }
+            );
+
+            if (response.data.success) {
+                // Redirect to Chapa checkout page
+                localStorage.setItem(`transactionStatus_${response.data.txRef}`, 'pending'); // Store initial status
+                localStorage.setItem('txRef', response.data.txRef); // Store txRef
+
+                // Attempt to detect window close (unreliable)
+                window.addEventListener('beforeunload', () => {
+                    localStorage.setItem('paymentCancelled', 'true');
+                });
+
+                window.location.href = response.data.checkoutUrl;
+            } else {
+                alert("Failed to initialize payment. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error initializing payment:", error);
+            alert("An error occurred. Please try again.");
+        } finally {
+            closeDepositModal(); // Close the modal after the deposit attempt
+        }
     };
 
     if (loading) {
@@ -189,6 +236,39 @@ const JobHistory = () => {
                                 disabled={isPaying}
                             >
                                 {isPaying ? "Processing..." : "Confirm Payment"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Deposit Modal */}
+            {showDepositModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Deposit FH-Coins</h2>
+                        <p className="text-gray-600 mb-4">
+                            You need to deposit at least 5 FH-Coins to get the contact information.
+                        </p>
+                        <input
+                            type="number"
+                            placeholder="Enter amount to deposit"
+                            value={depositAmount}
+                            onChange={(e) => setDepositAmount(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-md mb-4"
+                        />
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={closeDepositModal}
+                                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeposit}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
+                            >
+                                Deposit
                             </button>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ export function JobPostFlow() {
   const [coordinates, setCoordinates] = useState({ longitude: null, latitude: null });
   const [media, setMedia] = useState([]); // State to store uploaded media URLs
   const [uploading, setUploading] = useState(false); // State to track uploading status
+  const [userLocation, setUserLocation] = useState(null);
 
   // Cloudinary configuration
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -118,6 +119,7 @@ export function JobPostFlow() {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const { latitude, longitude } = position.coords;
           setCoordinates({ latitude, longitude });
+          setUserLocation({ latitude, longitude }); // Store user location
           setLoading(true);
 
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/search-providers`, {
@@ -192,12 +194,35 @@ export function JobPostFlow() {
     }
   };
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
+
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in km
+    return distance;
+  };
+
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
+  };
+
   const sortedProviders = [...providers].sort((a, b) => {
     if (sort === "averageRating") return b.averageRating - a.averageRating;
     if (sort === "price") return a.hourlyRate - b.hourlyRate;
     if (sort === "experience") return b.experience - a.experience; // Sort by experience
     if (sort === "completedJobs") return b.completedJobs - a.completedJobs; // Sort by completed jobs
-    if (sort === "distance") return a.distance - b.distance;
+    if (sort === "distance") {
+      const distanceA = calculateDistance(userLocation?.latitude, userLocation?.longitude, a.location?.coordinates[1], a.location?.coordinates[0]);
+      const distanceB = calculateDistance(userLocation?.latitude, userLocation?.longitude, b.location?.coordinates[1], b.location?.coordinates[0]);
+      return distanceA - distanceB;
+    }
     return 0;
   });
 
@@ -205,6 +230,18 @@ export function JobPostFlow() {
     const filledStars = '⭐'.repeat(Math.floor(rating));
     const emptyStars = '☆'.repeat(5 - Math.floor(rating));
     return filledStars + emptyStars;
+  };
+
+  const handleSortByDistance = () => {
+    if (!userLocation) {
+      alert("Please allow location access to sort by distance.");
+      return;
+    }
+    setSort("distance");
+  };
+
+  const handleRemoveMedia = (indexToRemove) => {
+    setMedia(prevMedia => prevMedia.filter((_, index) => index !== indexToRemove));
   };
 
   return (
@@ -232,10 +269,26 @@ export function JobPostFlow() {
               <div className="mt-2 flex flex-wrap">
                 {media.map((url, index) => (
                   <div key={index} className="w-24 h-24 m-1 relative">
-                    {url.match(/.(jpeg|jpg|gif|png)$/) ? (
-                      <img src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" />
+                    {url.match(/.(jpeg|jpg|gif|png|webp|bmp|tiff|tif|heic|heif|svg|ico|raw|jfif|avif)$/) ? (
+                      <div className="relative">
+                        <img src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" />
+                        <button
+                          onClick={() => handleRemoveMedia(index)}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                        >
+                          X
+                        </button>
+                      </div>
                     ) : (
-                      <video src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" controls />
+                      <div className="relative">
+                        <video src={url} alt={`Uploaded media ${index}`} className="w-full h-full object-cover rounded-md" controls />
+                        <button
+                          onClick={() => handleRemoveMedia(index)}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                        >
+                          X
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -330,7 +383,15 @@ export function JobPostFlow() {
           <h3 className="text-xl font-semibold text-blue-600 mb-4 text-center">
             Select a Service Provider
           </h3>
+
+          {/* Sort by Location Button */}
           <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={handleSortByDistance}
+              className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
+            >
+              Sort by Distance
+            </button>
             <button
               onClick={() => setSort("averageRating")}
               className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
@@ -367,75 +428,7 @@ export function JobPostFlow() {
                   </p>
                   <p className="text-sm text-gray-700">
                     Completed Jobs: {provider.completedJobs}
-                  </p>```javascript
-                  // Add a new state to store the selected provider
-                  const [selectedProvider, setSelectedProvider] = useState(null);
-
-// ...
-
-// Update the handleProviderSelect function to update the selectedProvider state
-const handleProviderSelect = async (providerId) => {
-  try {
-                    setLoading(true);
-
-                  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/select-provider`, {
-                    method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-                  body: JSON.stringify({
-                    providerId,
-                    description: jobDetails.description,
-                  category: jobDetails.category,
-                  location: {type: "Point", coordinates: [coordinates.longitude, coordinates.latitude] },
-                  budget: jobDetails.budget,
-                  isFixedPrice: jobDetails.isFixedPrice,
-                  media: media, // Include media URLs in the request
-      }),
-    });
-
-                  if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-                  const data = await response.json();
-                  setSelectedProvider(data.provider); // Update the selectedProvider state
-                  setStep(3); // Move to the confirmation step
-  } catch (error) {
-                    console.error("Error creating service request:", error);
-                  alert("Failed to create service request. Please try again.");
-  } finally {
-                    setLoading(false);
-  }
-};
-
-                  // ...
-
-                  // Update the step 3 component to display the selected provider's information
-                  {step === 3 && (
-                    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md text-center">
-                      <h3 className="text-2xl font-semibold text-blue-600 mb-4">
-                        Service Request Created Successfully!
-                      </h3>
-                      <p className="text-gray-700">
-                        Your service request has been sent to {selectedProvider && selectedProvider.email}. They will contact you soon.
-                      </p>
-                      <p className="text-gray-700">
-                        Provider Details:
-                      </p>
-                      <p className="text-gray-700">
-                        Email: {selectedProvider && selectedProvider.email}
-                      </p>
-                      <p className="text-gray-700">
-                        Hourly Rate: ${selectedProvider && selectedProvider.hourlyRate}
-                      </p>
-                      <p className="text-gray-700">
-                        Completed Jobs: {selectedProvider && selectedProvider.completedJobs}
-                      </p>
-                    </div>
-                  )}
-                  ```
+                  </p>
                   <p className="text-sm text-gray-700">
                     Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} km
                   </p> {/* Display distance in kilometers */}
