@@ -62,7 +62,7 @@ const SignIn = () => {
         // The request was made but no response was received
         setError("Network error. Please check your internet connection.");
       }
-       else {
+      else {
         // Something happened in setting up the request that triggered an Error
         setError("An unexpected error occurred. Please try again.");
       }
@@ -115,7 +115,7 @@ const SignIn = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-900">
                 Password
               </label>
-              <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">
+              <a href="/contact-admin" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">
                 Forgot password?
               </a>
             </div>

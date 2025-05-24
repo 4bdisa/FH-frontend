@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ReportsView from '../../components/admin/ReportsView';
 import UserManagement from '../../components/admin/UserManagement';
-import CreateAdmin from '../../components/admin/CreateAdmin'; // Import CreateAdmin component
+import CreateAdmin from '../../components/admin/CreateAdmin';
+import AnalyticsDashboard from '../../components/admin/AnalyticsDashboard'; // Import AnalyticsDashboard
 
 const AdminDashboardPage = () => {
     const [admin, setAdmin] = useState(null);
@@ -52,6 +53,7 @@ const AdminDashboardPage = () => {
                     },
                 });
 
+                
                 if (!response.ok) {
                     throw new Error('Failed to fetch reports');
                 }
@@ -106,7 +108,11 @@ const AdminDashboardPage = () => {
     };
 
     const handleAddAdmin = () => {
-        setActiveView('createAdmin'); // Set active view to 'createAdmin'
+        setActiveView('createAdmin');
+    };
+
+    const handleAnalyticsDashboard = () => {
+        setActiveView('analytics');
     };
 
     if (error) {
@@ -140,7 +146,9 @@ const AdminDashboardPage = () => {
             case 'users':
                 return <UserManagement />;
             case 'createAdmin':
-                return <CreateAdmin />; // Render CreateAdmin component
+                return <CreateAdmin />;
+            case 'analytics':
+                return <AnalyticsDashboard />; // Render AnalyticsDashboard
             default:
                 return (
                     <div className="bg-white rounded-lg shadow-md p-6">
@@ -195,6 +203,12 @@ const AdminDashboardPage = () => {
                                 onClick={handleAddAdmin}
                             >
                                 <span className="text-gray-700">Add Another Admin</span>
+                            </li>
+                             <li
+                                className={`py-2 px-4 hover:bg-gray-300 cursor-pointer rounded-md transition duration-300 ease-in-out ${activeView === 'analytics' ? 'bg-gray-300' : ''}`}
+                                onClick={handleAnalyticsDashboard}
+                            >
+                                <span className="text-gray-700">Analytics Dashboard</span>
                             </li>
                         </ul>
                     </nav>

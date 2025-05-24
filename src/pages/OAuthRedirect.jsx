@@ -33,6 +33,8 @@ const OAuthRedirect = () => {
           })
         );
 
+        localStorage.setItem("userId", parsedUser.id);
+
         // Redirect based on role
         if (parsedUser.role === "service_provider") {
           setTimeout(() => navigate("/service-provider-dashboard"), 0);

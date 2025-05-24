@@ -39,9 +39,11 @@ const JobHistoryBox = ({
 
     const handleReportSubmit = async () => {
         try {
+            
             const reporterId = localStorage.getItem('userId');
+            console.log("Reporter ID:", reporterId);
             if (!reporterId) return;
-            const response = await API.post("/api/reports", {
+            const response = await API.post("/api/reports/create", {
                 requestId: request._id,
                 reportType,
                 comment: reportComment,

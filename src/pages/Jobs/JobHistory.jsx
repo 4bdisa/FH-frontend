@@ -64,7 +64,7 @@ const JobHistory = () => {
                 setShowDepositModal(true);
                 return;
             }
-            
+
             // Process payment
             const paymentResponse = await API.patch(`/api/v1/requests/${selectedRequest._id}/pay`);
 
