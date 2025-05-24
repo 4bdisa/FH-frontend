@@ -22,6 +22,7 @@ const ServiceProviderDashboard = () => {
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
+        localStorage.removeItem("userId");
         navigate("/pages/SignIn");
     };
 

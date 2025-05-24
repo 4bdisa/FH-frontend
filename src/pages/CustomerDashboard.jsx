@@ -64,6 +64,10 @@ const CustomerDashboard = () => {
     const handleSignOut = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
+        localStorage.removeItem("userId"); // Clear txRef on sign out
+        localStorage.removeItem("txRef"); // Clear txRef on sign out
+        localStorage.removeItem("transactionStatus"); // Clear transaction status on sign out
+        localStorage.removeItem("paymentCancelled"); // Clear payment cancelled status on sign out
         navigate("/pages/SignIn");
     };
 

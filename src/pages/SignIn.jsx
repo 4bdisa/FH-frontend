@@ -6,15 +6,43 @@ import Nano from "../assets/giflogo.gif"; // Ensure this file exists in the asse
 
 const SignIn = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = ({ target: { name, value } }) => {
     setFormData({ ...formData, [name]: value });
+    // Clear any existing error for the field when the user types
+    setErrors({ ...errors, [name]: "" });
+  };
+
+  const validate = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    if (!formData.email) {
+      tempErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      tempErrors.email = "Email is not valid";
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      tempErrors.password = "Password is required";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
 
     try {
       const { token, user } = await loginUser({
@@ -64,7 +92,7 @@ const SignIn = () => {
       }
       else {
         // Something happened in setting up the request that triggered an Error
-        setError("An unexpected error occurred. Please try again.");
+        setError("Incorrect Credential.");
       }
     }
   };
@@ -105,8 +133,9 @@ const SignIn = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border-2 border-blue-500 bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+              className={`mt-2 block w-full rounded-md border-2 ${errors.email ? 'border-red-500' : 'border-blue-500'} bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
 
           {/* Password Input */}
@@ -126,8 +155,9 @@ const SignIn = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border-2 border-blue-500 bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+              className={`mt-2 block w-full rounded-md border-2 ${errors.password ? 'border-red-500' : 'border-blue-500'} bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm`}
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
 
           {/* Sign-In Button */}
