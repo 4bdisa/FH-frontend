@@ -142,7 +142,7 @@ const ServiceProviderDashboard = () => {
                                             <h3 className="text-lg font-semibold text-gray-800">Category: {job.category}</h3>
                                             <p className="text-gray-600">Description: {job.description}</p>
                                             <p className="text-sm text-gray-500">
-                                                Completed on: {new Date(job.updatedAt).toLocaleDateString()}
+                                                Completed on: {new Date(job.createdAt).toLocaleDateString()}
                                             </p>
                                             {job.reviewId && (
                                                 <div className="mt-2">
