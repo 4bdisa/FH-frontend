@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReportsView from '../../components/admin/ReportsView.jsx';
 import UserManagement from '../../components/admin/UserManagement.jsx';
-import CreateAdmin from '../../components/admin/CreateAdmin.jsx';
+import CreateAdmin from '../../components/admin/createadmin.jsx';
 import AnalyticsDashboard from '../../components/admin/analyticsdashboard.jsx'; // Import AnalyticsDashboard
 
 const AdminDashboardPage = () => {
