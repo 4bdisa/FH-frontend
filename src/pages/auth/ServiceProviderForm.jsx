@@ -71,62 +71,69 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h2 className="text-2xl font-bold mb-6 text-center">Complete service-provider Registration</h2>
-    
-    {locationError && (
-      <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-        {locationError}
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Complete service-provider Registration
+      </h2>
+
+      {locationError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {locationError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Password</label>
+          <input
+            {...register("password")}
+            type="password"
+            className="w-full p-2 border rounded"
+            placeholder="Password"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Category</label>
+          <input
+            {...register("skills")}
+            className="w-full p-2 border rounded"
+            placeholder="categorys eg. TV,Phone (comma separated)"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Experience Years
+          </label>
+          <input
+            {...register("experienceYears")}
+            type="number"
+            className="w-full p-2 border rounded"
+            placeholder="Experience Years"
+            required
+          />
+        </div>
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={locationError}
+            className={`w-full py-2 px-4 rounded text-white ${
+              locationError ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            Complete Registration
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>
+          By registering, you agree to our Terms of Service and Privacy Policy
+        </p>
       </div>
-    )}
-  
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Password</label>
-        <input
-          {...register('password')}
-          type="password"
-          className="w-full p-2 border rounded"
-          placeholder="Password"
-          required
-        />
-      </div>
-  
-      <div>
-        <label className="block text-sm font-medium mb-1">Skills</label>
-        <input
-          {...register('skills')}
-          className="w-full p-2 border rounded"
-          placeholder="Skills (comma separated)"
-          required
-        />
-      </div>
-  
-      <div>
-        <label className="block text-sm font-medium mb-1">Experience Years</label>
-        <input
-          {...register('experienceYears')}
-          type="number"
-          className="w-full p-2 border rounded"
-          placeholder="Experience Years"
-          required
-        />
-      </div>
-  
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={locationError}
-          className={`w-full py-2 px-4 rounded text-white ${locationError ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-        >
-          Complete Registration
-        </button>
-      </div>
-    </form>
-  
-    <div className="mt-4 text-sm text-gray-600">
-      <p>By registering, you agree to our Terms of Service and Privacy Policy</p>
     </div>
-  </div>
-  
   );
 }; export default ServiceProviderForm;

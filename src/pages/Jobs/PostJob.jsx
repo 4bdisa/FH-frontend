@@ -398,12 +398,7 @@ export function JobPostFlow() {
             >
               Sort by averageRating
             </button>
-            <button
-              onClick={() => setSort("price")}
-              className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
-            >
-              Sort by Price
-            </button>
+          
             <button
               onClick={() => setSort("completedJobs")}
               className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
@@ -423,9 +418,6 @@ export function JobPostFlow() {
                     {provider.email}
                   </h4>
 
-                  <p className="text-sm text-gray-700">
-                    Hourly Rate: ${provider.hourlyRate}
-                  </p>
                   <p className="text-sm text-gray-700">
                     Completed Jobs: {provider.completedJobs}
                   </p>

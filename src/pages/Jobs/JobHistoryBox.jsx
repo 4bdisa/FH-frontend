@@ -39,7 +39,7 @@ const JobHistoryBox = ({
 
     const handleReportSubmit = async () => {
         try {
-            
+
             const reporterId = localStorage.getItem('userId');
             console.log("Reporter ID:", reporterId);
             if (!reporterId) return;
@@ -63,7 +63,9 @@ const JobHistoryBox = ({
     return (
         <li
             key={request._id}
-            className={`bg-white shadow-lg border border-blue-200 rounded-xl flex flex-col justify-between items-start relative w-full max-w-5xl mx-auto p-6 mb-4 transition-transform duration-200 hover:scale-105 ${request.status === "accepted" ? "cursor-pointer hover:shadow-blue-400/60" : ""
+            className={`bg-white shadow-lg border border-blue-200 rounded-xl flex flex-col justify-between items-start relative w-full max-w-5xl mx-auto p-6 mb-4 transition-transform duration-200 hover:scale-105 ${request.status === "accepted"
+                ? "cursor-pointer hover:shadow-blue-400/60"
+                : ""
                 }`}
             style={{ boxSizing: "border-box" }}
         >
@@ -85,8 +87,10 @@ const JobHistoryBox = ({
 
             {/* Request Details */}
             <div className="w-full">
-                <h2 className="text-lg font-semibold text-blue-700">{request.category}</h2>
-                <p className="text-gray-600">{request.description}</p>
+                <h2 className="text-lg font-semibold text-blue-700">
+                    Category: {request.category}
+                </h2>
+                <p className="text-gray-600">Description: {request.description}</p>
                 <p
                     className={`mt-2 font-medium ${request.status === "accepted"
                         ? "text-green-600"
@@ -97,7 +101,8 @@ const JobHistoryBox = ({
                                 : "text-yellow-600"
                         }`}
                 >
-                    Status: {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                    Status:{" "}
+                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                 </p>
             </div>
 
@@ -106,16 +111,18 @@ const JobHistoryBox = ({
                 <div className="flex items-center space-x-2 mt-4">
                     <div className="relative w-10 h-10">
                         <img
-                            src={request.providerId.photo}
+                            src={request.providerId.profileImage}
                             alt={request.providerId.name}
                             className="w-10 h-10 rounded-full border border-blue-200"
                             onError={(e) => (e.target.src = "/default-avatar.png")}
                         />
-                        {!request.providerId.photo && (
+                        {!request.providerId.profileImage && (
                             <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-full"></div>
                         )}
                     </div>
-                    <span className="text-gray-700 text-sm">{request.providerId.name}</span>
+                    <span className="text-gray-700 text-sm">
+                        {request.providerId.name}
+                    </span>
                 </div>
             )}
 
@@ -126,7 +133,10 @@ const JobHistoryBox = ({
                         {Array.from({ length: 5 }).map((_, index) => (
                             <svg
                                 key={index}
-                                className={`w-4 h-4 ${index < (request.reviewId.rating || 0) ? "text-yellow-300" : "text-gray-300"}`}
+                                className={`w-4 h-4 ${index < (request.reviewId.rating || 0)
+                                    ? "text-yellow-300"
+                                    : "text-gray-300"
+                                    }`}
                                 aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="currentColor"
@@ -167,7 +177,9 @@ const JobHistoryBox = ({
                 <div className="mt-4 w-full">
                     <button
                         onClick={() =>
-                            navigate(`/customer-dashboard/job-history/${request._id}/review`)
+                            navigate(
+                                `/customer-dashboard/job-history/${request._id}/review`
+                            )
                         }
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
                     >
@@ -177,10 +189,19 @@ const JobHistoryBox = ({
             )}
             {/* Report Button */}
             <div className="mt-4 w-full">
-                {!hideReportButton && request.status !== "completed" && !reportSubmitted && (
-                    <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500" onClick={handleReportClick}>Report</button>
+                {!hideReportButton &&
+                    request.status !== "completed" &&
+                    !reportSubmitted && (
+                        <button
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
+                            onClick={handleReportClick}
+                        >
+                            Report
+                        </button>
+                    )}
+                {reportSubmitted && (
+                    <p className="text-green-600">You reported successfully</p>
                 )}
-                {reportSubmitted && <p className="text-green-600">You reported successfully</p>}
             </div>
             {/* Report Modal */}
             {reportModalOpen && (
@@ -188,7 +209,12 @@ const JobHistoryBox = ({
                     <div className="bg-white p-8 rounded-lg">
                         <h2 className="text-lg font-semibold mb-4">Report Request</h2>
                         <div className="mb-4">
-                            <label htmlFor="reportType" className="block text-gray-700 text-sm font-bold mb-2">Report Type:</label>
+                            <label
+                                htmlFor="reportType"
+                                className="block text-gray-700 text-sm font-bold mb-2"
+                            >
+                                Report Type:
+                            </label>
                             <select
                                 id="reportType"
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -203,7 +229,12 @@ const JobHistoryBox = ({
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="reportComment" className="block text-gray-700 text-sm font-bold mb-2">Comment:</label>
+                            <label
+                                htmlFor="reportComment"
+                                className="block text-gray-700 text-sm font-bold mb-2"
+                            >
+                                Comment:
+                            </label>
                             <textarea
                                 id="reportComment"
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"

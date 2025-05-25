@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API from "../services/api";
+import CustomerSidebar from "../components/CustomerSidebar";
 
 const CustomerDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user")) || {
@@ -145,108 +146,7 @@ const CustomerDashboard = () => {
     return (
         <div className="flex min-h-screen bg-blue-50">
             {/* Sidebar */}
-            <aside className="w-64 bg-white shadow-lg">
-                <div className="p-6">
-                    <h2 className="text-2xl font-semibold text-blue-600">FixerHub</h2>
-                </div>
-                <nav className="mt-6">
-                    <ul className="space-y-2">
-                        <li>
-                            <Link
-                                to="/customer-dashboard"
-                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
-                            >
-                                <svg
-                                    className="w-5 h-5 mr-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                                    ></path>
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M9 21V9h6v12"
-                                    ></path>
-                                </svg>
-                                Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/customer-dashboard/profile-update" // Corrected Route
-                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
-                            >
-                                <svg
-                                    className="w-5 h-5 mr-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M5 13l4 4L19 7"
-                                    ></path>
-                                </svg>
-                                Update Profile
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/customer-dashboard/post-job"
-                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
-                            >
-                                <svg
-                                    className="w-5 h-5 mr-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M12 4v16m8-8H4"
-                                    ></path>
-                                </svg>
-                                Post Job
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/customer-dashboard/job-history"
-                                className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-md"
-                            >
-                                <svg
-                                    className="w-5 h-5 mr-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M12 4v16m8-8H4"
-                                    ></path>
-                                </svg>
-                                Job History
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+            <CustomerSidebar />
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col">

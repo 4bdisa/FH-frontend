@@ -259,7 +259,7 @@ const AnalyticsDashboard = () => {
                 </div>
                 <div className="bg-white shadow-md rounded-md p-4">
                     <h3 className="text-lg font-semibold text-gray-700">Revenue Generated</h3>
-                    <p className="text-2xl text-gray-600">${revenue}</p>
+                    <p className="text-2xl text-gray-600">${revenue} ETB Birr</p>
                 </div>
             </div>
 

@@ -45,8 +45,8 @@ const ProviderJobHistory = () => {
                         >
                             {/* Request Details */}
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-800">{request.category}</h2>
-                                <p className="text-gray-600">{request.description}</p>
+                                <h2 className="text-lg font-semibold text-gray-800">Category: {request.category}</h2>
+                                <p className="text-gray-600">Description: {request.description}</p>
                                 <p
                                     className={`mt-2 font-medium ${request.status === "accepted"
                                             ? "text-green-600"
@@ -67,7 +67,7 @@ const ProviderJobHistory = () => {
                                 <div className="flex items-center space-x-2 mt-4">
                                     <div className="relative w-10 h-10">
                                         <img
-                                            src={request.customer.photo || "/default-avatar.png"}
+                                            src={request.customer.profileImage || "/default-avatar.png"}
                                             alt={request.customer.name}
                                             className="w-10 h-10 rounded-full"
                                             onError={(e) => (e.target.src = "/default-avatar.png")} // Fallback on error

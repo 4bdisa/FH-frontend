@@ -95,10 +95,7 @@ const ViewProfile = () => {
                                 ))}
                             </div>
 
-                            <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Keywords</h2>
-                            <p className="text-gray-700 dark:text-gray-300 mb-6">
-                                {profile.keywords || "Not specified"}
-                            </p>
+                          
 
                             <h2 className="text-xl font-semibold text-indigo-800 dark:text-white mb-4">Country</h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-6">

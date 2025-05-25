@@ -5,7 +5,7 @@ import 'react-phone-number-input/style.css';
 const UpdateProfile = () => {
     const [formData, setFormData] = useState({
         skills: "",
-        keywords: "",
+        
         country: "",
         workDays: "",
         experienceYears: "",
@@ -82,17 +82,7 @@ const UpdateProfile = () => {
                         className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Keywords</label>
-                    <input
-                        type="text"
-                        name="keywords"
-                        value={formData.keywords}
-                        onChange={handleChange}
-                        placeholder="e.g., Repair, Maintenance"
-                        className="w-full p-3 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
+              
                 <div className="mb-4">
                     <label className="block text-gray-700 font-medium mb-2">Country</label>
                     <input
