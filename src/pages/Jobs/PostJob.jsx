@@ -422,7 +422,7 @@ export function JobPostFlow() {
                     Completed Jobs: {provider.completedJobs}
                   </p>
                   <p className="text-sm text-gray-700">
-                    Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} km
+                    Distance: {provider.distance ? (provider.distance / 1000).toFixed(2) : "Not Available"} meter
                   </p> {/* Display distance in kilometers */}
                   {/* Display Average Rating */}
                   {provider.averageRating !== undefined && (
